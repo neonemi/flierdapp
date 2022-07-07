@@ -5,10 +5,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../colors/colors.dart';
-import '../../db/db.dart';
-import '../../utils/style.dart';
-import '../homepage/homepage.dart';
+
+import '../../../colors/colors.dart';
+import '../../../db/db.dart';
+import '../../../utils/style.dart';
+import '../chatpage.dart';
+
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -123,7 +125,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const HomePage()));
+        context, MaterialPageRoute(builder: (context) => const ChatPage()));
     // Do some stuff.
     return true;
   }
@@ -280,7 +282,7 @@ class ChatScreenState extends State<ChatScreen> {
                   IconButton(
                     onPressed: () {
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => const HomePage()));
+                          MaterialPageRoute(builder: (context) => const ChatPage()));
                     },
                     icon: const Icon(
                       Icons.arrow_back_ios,
@@ -373,7 +375,7 @@ class ChatScreenState extends State<ChatScreen> {
 
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              gradient: const LinearGradient(
+                              gradient:  LinearGradient(
                                 begin: Alignment(-0.95, 0.0),
                                 end: Alignment(1.0, 0.0),
                                 colors: [

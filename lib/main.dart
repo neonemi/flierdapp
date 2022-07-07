@@ -1,6 +1,7 @@
 
 import 'package:flierdapp/colors/colors.dart';
-import 'package:flierdapp/ui/homepage/homepage.dart';
+import 'package:flierdapp/ui/chat/chatpage.dart';
+
 import 'package:flierdapp/utils/string.dart';
 import 'package:flutter/material.dart';
 
@@ -96,7 +97,7 @@ class MyApp extends StatelessWidget {
                   child: TextButton(
                     onPressed: () {
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => const HomePage()));
+                          MaterialPageRoute(builder: (context) => const ChatPage()));
                     },
                     child: const Text(
                       goChat,
