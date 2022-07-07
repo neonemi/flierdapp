@@ -39,7 +39,7 @@ dependencies:
   image_picker:
   file_picker:
   sqflite:
-
+  custom_pop_up_menu: ^1.2.4
 dev_dependencies:
   flutter_test:
     sdk: flutter

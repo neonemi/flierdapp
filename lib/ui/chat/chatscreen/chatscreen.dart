@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,12 @@ import '../../../db/db.dart';
 import '../../../utils/style.dart';
 import '../chatpage.dart';
 
+class ItemModel {
+  String title;
+  IconData icon;
 
+  ItemModel(this.title, this.icon);
+}
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
 
@@ -36,6 +42,9 @@ class ChatScreenState extends State<ChatScreen> {
   String fileType = 'All';
   var fileTypeList = ['All', 'Image', 'Video', 'Audio', 'MultipleFile'];
   var fileTypegallery = ['Image', 'Video'];
+
+  CustomPopupMenuController _controller = CustomPopupMenuController();
+
   void _pickFile() async {
     final result = await FilePicker.platform.pickFiles(allowMultiple: true,type:FileType.image );
 
@@ -107,7 +116,16 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   // Update an existing journal
-
+  List<ItemModel> menuItems = [
+    ItemModel('copy', Icons.content_copy),
+    ItemModel('send', Icons.send),
+    ItemModel('collect', Icons.collections),
+    ItemModel('delete', Icons.delete),
+    ItemModel('Multiple choice', Icons.playlist_add_check),
+    ItemModel('quote', Icons.format_quote),
+    ItemModel('remind', Icons.add_alert),
+    ItemModel('search', Icons.search),
+  ];
 
   @override
   void initState() {
@@ -115,6 +133,7 @@ class ChatScreenState extends State<ChatScreen> {
 
     BackButtonInterceptor.add(myInterceptor);
     _refreshchatlist();
+
   }
 
   @override
@@ -258,7 +277,42 @@ class ChatScreenState extends State<ChatScreen> {
                   ]),
             ));
   }
-
+  Widget _buildLongPressMenu() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(5),
+      child: Container(
+        width: 220,
+        color: Colors.grey,
+        child: GridView.count(
+          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+          crossAxisCount: 5,
+          crossAxisSpacing: 0,
+          mainAxisSpacing: 10,
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          children: menuItems
+              .map((item) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Icon(
+                item.icon,
+                size: 20,
+                color: Colors.white,
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 2),
+                child: Text(
+                  item.title,
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              ),
+            ],
+          ))
+              .toList(),
+        ),
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     log(_chatlist.toString());
@@ -357,10 +411,10 @@ class ChatScreenState extends State<ChatScreen> {
                 color:  Colors.grey.shade100,
                 child: Row(
                   children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        chooser(context);
-                      },
+                    CustomPopupMenu(
+                      menuBuilder: _buildLongPressMenu,
+                      barrierColor: Colors.transparent,
+                      pressType: PressType.longPress,
                       child: Container(
                         height: 60,
                         width: 60,
