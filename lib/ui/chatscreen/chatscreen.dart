@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 
 
 import '../../db/db.dart';
+import '../../utils/style.dart';
 import '../homepage/homepage.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -252,66 +253,76 @@ class ChatScreenState extends State<ChatScreen> {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     return Scaffold(
+      backgroundColor: Colors.white,
         key: _scaffoldKey,
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          elevation: 0,
+          toolbarHeight: 90,
+          elevation: 0.0,
+
           automaticallyImplyLeading: false,
           backgroundColor: Colors.white,
           flexibleSpace: SafeArea(
-            child: Container(
-              padding: const EdgeInsets.only(right: 16),
-              child: Row(
-                children: <Widget>[
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => const HomePage()));
-                    },
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 2,
-                  ),
-                  const CircleAvatar(
-                    // backgroundImage: NetworkImage("<https://randomuser.me/api/portraits/men/5.jpg>"),
-                    maxRadius: 20,
-                  ),
-                  const SizedBox(
-                    width: 12,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        const Text(
-                          "Name",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w600),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(right: 16,left: 8),
+                  child: Row(
+                    children: <Widget>[
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(context,
+                              MaterialPageRoute(builder: (context) => const HomePage()));
+                        },
+                        icon: const Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.black,
                         ),
-                        const SizedBox(
-                          height: 6,
+                      ),
+                      const SizedBox(
+                        width: 2,
+                      ),
+                      const CircleAvatar(
+                        // backgroundImage: NetworkImage("<https://randomuser.me/api/portraits/men/5.jpg>"),
+                        maxRadius: 20,
+                      ),
+                      const SizedBox(
+                        width: 12,
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            const Text(
+                              "Name",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(
+                              height: 6,
+                            ),
+                            Text(
+                              "Online",
+                              style: TextStyle(
+                                  color: Colors.grey.shade600, fontSize: 13),
+                            ),
+                          ],
                         ),
-                        Text(
-                          "Online",
-                          style: TextStyle(
-                              color: Colors.grey.shade600, fontSize: 13),
-                        ),
-                      ],
-                    ),
+                      ),
+                      const Icon(
+                        Icons.more_horiz,
+                        color: Colors.black54,size: 32,
+                      ),
+                    ],
                   ),
-                  const Icon(
-                    Icons.settings,
-                    color: Colors.black54,
-                  ),
-                ],
-              ),
+                ),
+                Divider(color: Colors.grey,),
+              ],
             ),
+
           ),
+
         ),
         body: Stack(children: <Widget>[
           Align(
@@ -390,27 +401,36 @@ class ChatScreenState extends State<ChatScreen> {
                     shrinkWrap: true,
                     padding: const EdgeInsets.only(top: 10, bottom: 10),
                     physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) => Container(
-                          padding: const EdgeInsets.only(
-                              left: 14, right: 14, top: 10, bottom: 10),
+                    itemBuilder: (context, index) =>  Column(
+                      children: [
+                        Container(
+
+                          padding: EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
                           child: Align(
                             alignment: Alignment.topRight,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: Colors.blue[200],
-                              ),
-                              padding: const EdgeInsets.all(16),
-                              child: Text(
-                                _chatlist.isNotEmpty
-                                    ? _chatlist[index]['message']
-                                    : "",
-                                style: const TextStyle(
-                                    fontSize: 15, color: Colors.black),
-                              ),
+                            child:Container(
+                              padding: EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                              decoration: Styles.boxme,
+                              child: Text(_chatlist.isNotEmpty?_chatlist[index]['message']:"",
+                                style: TextStyle(fontSize: 15,color: Colors.white),),
                             ),
                           ),
-                        )),
+                        ),
+                        Container(
+
+                          padding: EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child:Container(
+                              padding: EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                              decoration: Styles.boxsomebody,
+                              child: Text(_chatlist.isNotEmpty?_chatlist[index]['message']:"",
+                                style: TextStyle(fontSize: 15,color: Colors.black),),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
           ),
         ]));
   }

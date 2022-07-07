@@ -1,6 +1,8 @@
 import 'dart:developer';
 
+import 'package:flierdapp/colors/colors.dart';
 import 'package:flierdapp/ui/homepage/homepage.dart';
+import 'package:flierdapp/utils/string.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Chat App",
+                  ChatApp,
                   style: TextStyle(
                       color: Colors.black,
                       fontSize: 32,
@@ -38,7 +40,7 @@ class MyApp extends StatelessWidget {
                   height: 20,
                 ),
                 Text(
-                  "Confirmation that invitation has been sent",
+                  Confirmation_that_invitation_has_been_sent,
                   style: TextStyle(color: Colors.black, fontSize: 14),
                   textAlign: TextAlign.center,
                 )
@@ -58,8 +60,8 @@ class MyApp extends StatelessWidget {
                       begin: Alignment(-0.95, 0.0),
                       end: Alignment(1.0, 0.0),
                       colors: [
-                        const Color(0xff0000FF),
-                        const Color(0xffA020F0)
+                       ColorConstant.gradient2,
+                        ColorConstant.gradient1,
                       ],
                       stops: [0.0, 1.0],
                     ),
@@ -84,7 +86,7 @@ class MyApp extends StatelessWidget {
                       //         builder: (context) => QuizPage()));
                     },
                     child: const Text(
-                      "Continue Swiping",
+                      Continue_Swiping,
                       style: TextStyle(color: Colors.white, fontSize: 14),
                       textAlign: TextAlign.center,
                     ),
@@ -98,7 +100,7 @@ class MyApp extends StatelessWidget {
                           MaterialPageRoute(builder: (context) => HomePage()));
                     },
                     child: Text(
-                      "Go to chat",
+                      Go_to_chat,
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 14,
