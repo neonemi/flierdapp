@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../colors/colors.dart';
 import '../../main.dart';
-import '../chatscreen/chatscreen.dart';
+import 'chatscreen/chatscreen.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+
+class ChatPage extends StatefulWidget {
+  const ChatPage({Key? key}) : super(key: key);
 
   @override
-  HomePageState createState() => HomePageState();
+  ChatPageState createState() => ChatPageState();
 }
 
-class HomePageState extends State<HomePage> with ChangeNotifier {
+class ChatPageState extends State<ChatPage> with ChangeNotifier {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final List<Map<String, String>> listOfColumns = [
     {
