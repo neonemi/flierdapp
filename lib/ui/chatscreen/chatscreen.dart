@@ -1,13 +1,11 @@
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:back_button_interceptor/back_button_interceptor.dart';
-
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-
-
+import '../../colors/colors.dart';
 import '../../db/db.dart';
 import '../../utils/style.dart';
 import '../homepage/homepage.dart';
@@ -29,9 +27,31 @@ class ChatScreenState extends State<ChatScreen> {
   File? _image;
   File? _video;
   final ImagePicker _picker = ImagePicker();
+  File? result1;
+  var filepath;
+  FilePickerResult? result;
+  var filename;
+  String fileType = 'All';
+  var fileTypeList = ['All', 'Image', 'Video', 'Audio', 'MultipleFile'];
+  var fileTypegallery = ['Image', 'Video'];
+  void _pickFile() async {
+    final result = await FilePicker.platform.pickFiles(allowMultiple: true,type:FileType.image );
 
+    setState(() {
+      if (result != null) {
+        result1=result as File?;
+        result.files.first.name;
+        filepath=result.files.first.path;
+      }
+    });
+    if (result == null) return;
+    filename = result.files.first.name;
+    print(result.files.first.name);
+    print(result.files.first.size);
+    print(result.files.first.path);
+  }
   Future getImagefromcamera() async {
-    var image = await _picker.getImage(source: ImageSource.camera);
+    var image = await _picker.pickImage(source: ImageSource.camera);
 
     setState(() {
       _image = File(image!.path);
@@ -41,7 +61,7 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   Future getImagefromGallery() async {
-    var image = await _picker.getImage(source: ImageSource.gallery);
+    var image = await _picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       _image = File(image!.path);
@@ -61,7 +81,7 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   Future getVideofromCamera() async {
-    var video = await _picker.getVideo(source: ImageSource.camera);
+    var video = await _picker.pickVideo(source: ImageSource.camera);
 
     setState(() {
       _video = File(video!.path);
@@ -85,18 +105,7 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   // Update an existing journal
-  Future<void> _updateItem(int id) async {
-    await SQLHelper.updateItem(id, _messageController.text);
-    _refreshchatlist();
-  }
 
-  void _deleteItem(int id) async {
-    await SQLHelper.deleteItem(id);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Successfully deleted a journal!'),
-    ));
-    _refreshchatlist();
-  }
 
   @override
   void initState() {
@@ -218,6 +227,7 @@ class ChatScreenState extends State<ChatScreen> {
                             ),
                           ),
                         ),
+                        const Text("Record")
                       ],
                     ),
                     Column(
@@ -255,184 +265,251 @@ class ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
         key: _scaffoldKey,
-        resizeToAvoidBottomInset: false,
+       // resizeToAvoidBottomInset: false,
         appBar: AppBar(
           toolbarHeight: 90,
-          elevation: 0.0,
+          elevation: 1.0,
 
           automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.grey.shade100,
           flexibleSpace: SafeArea(
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.only(right: 16,left: 8),
-                  child: Row(
-                    children: <Widget>[
-                      IconButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(context,
-                              MaterialPageRoute(builder: (context) => const HomePage()));
-                        },
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 2,
-                      ),
-                      const CircleAvatar(
-                        // backgroundImage: NetworkImage("<https://randomuser.me/api/portraits/men/5.jpg>"),
-                        maxRadius: 20,
-                      ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            const Text(
-                              "Name",
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w600),
-                            ),
-                            const SizedBox(
-                              height: 6,
-                            ),
-                            Text(
-                              "Online",
-                              style: TextStyle(
-                                  color: Colors.grey.shade600, fontSize: 13),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Icon(
-                        Icons.more_horiz,
-                        color: Colors.black54,size: 32,
-                      ),
-                    ],
+            child: Container(
+              padding: const EdgeInsets.only(right: 16,left: 8),
+              child: Row(
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => const HomePage()));
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                Divider(color: Colors.grey,),
-              ],
+                  const SizedBox(
+                    width: 2,
+                  ),
+                  const CircleAvatar(
+                    // backgroundImage: NetworkImage("<https://randomuser.me/api/portraits/men/5.jpg>"),
+                    maxRadius: 20,
+                  ),
+                  const SizedBox(
+                    width: 12,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        const Text(
+                          "Name",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(
+                          height: 6,
+                        ),
+                        Text(
+                          "Online",
+                          style: TextStyle(
+                              color: Colors.grey.shade600, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(
+                    Icons.more_horiz,
+                    color: Colors.black54,size: 32,
+                  ),
+                ],
+              ),
             ),
 
           ),
 
         ),
-        body: Stack(children: <Widget>[
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: Container(
-              padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
-              height: 60,
-              width: double.infinity,
-              color: Colors.white,
-              child: Row(
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () {
-                      chooser(context);
-                    },
-                    child: Container(
-                      height: 30,
-                      width: 30,
-                      decoration: BoxDecoration(
-                        color: Colors.lightBlue,
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: const Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: 20,
+        body: Container(
+          color:  Colors.grey.shade100,
+          // decoration: BoxDecoration(
+          //   borderRadius: BorderRadius.circular(30.0),
+          //   gradient:  LinearGradient(
+          //     begin: Alignment(-0.95, 0.0),
+          //     end: Alignment(1.0, 0.0),
+          //     colors: [
+          //       ColorConstant.bg1,
+          //       ColorConstant.bg2,
+          //     ],
+          //     stops: [0.0, 1.0],
+          //   ),
+          // ),
+          child: Stack(children: <Widget>[
+
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: Container(
+                padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
+                height: 80,
+              
+                // width: double.infinity,
+                color:  Colors.grey.shade100,
+                child: Row(
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        chooser(context);
+                      },
+                      child: Container(
+                        height: 60,
+                        width: 60,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Container(
+                            height: 20,
+                            width: 30,
+
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              gradient: const LinearGradient(
+                                begin: Alignment(-0.95, 0.0),
+                                end: Alignment(1.0, 0.0),
+                                colors: [
+                                  ColorConstant.gradient2,
+                                  ColorConstant.gradient1,
+                                ],
+                                stops: [0.0, 1.0],
+                              ),
+                            ),
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(child: Image.asset("assets/images/plusicon.png",color: Colors.white,height: 20,width: 10,),),
+                                  Container(child: Image.asset("assets/images/twodots.png",color: Colors.white,height: 10,width: 10,),)
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: _messageController,
-                      cursorColor: Colors.black,
-                      // onChanged: (value){
-                      //   _messageController.text=value;
-                      // },
-                      decoration: const InputDecoration(
-                          hintText: "Write message...",
-                          hintStyle: TextStyle(color: Colors.black54),
-                          border: InputBorder.none),
-                      keyboardType: TextInputType.text,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.singleLineFormatter
-                      ],
+                    SizedBox(
+                      width: 15,
+                      child: Container(
+                        color: Colors.grey.shade100,
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  FloatingActionButton(
-                    onPressed: () async {
-                      await _addItem();
-                    },
-                    child: const Icon(
-                      Icons.send,
+                    Expanded(
+                      child: Container(
+                        height: 80,
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(topLeft: Radius.circular(30),topRight: Radius.circular(30))
+                        ),
+                        child: TextField(
+                          controller: _messageController,
+                          cursorColor: Colors.black,
+                          keyboardType: TextInputType.multiline,
+                          textInputAction: TextInputAction.done,
+                          maxLines: null,
+
+                          // onChanged: (value){
+                          //   _messageController.text=value;
+                          // },
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(10),
+                            filled: true,
+                              fillColor: Colors.white,
+                              hintText: "Write message...",
+                              hintStyle: TextStyle(color: Colors.black54),
+                              border: InputBorder.none,
+
+
+                          ),
+                          // keyboardType: TextInputType.text,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.singleLineFormatter
+                          ],
+                        ),
+                      ),
+                    ),
+                 SizedBox(
+                      width: 15,
+                   child: Container(
+                     color: Colors.white,
+                   ),
+                    ),
+                    Container(
                       color: Colors.white,
-                      size: 18,
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        child: FloatingActionButton(
+                          onPressed: () async {
+                            await _addItem();
+                          },
+                          backgroundColor: Colors.grey.shade100,
+                          elevation: 0,
+                          child:Container(
+                              padding: EdgeInsets.all(2),
+                              height: 50,width: 30,
+                              child:Image.asset("assets/images/sendicon.png",color: ColorConstant.lightblue,height: 30,width: 30,))
+                        ),
+                      ),
                     ),
-                    backgroundColor: Colors.blue,
-                    elevation: 0,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          Align(
-            child: _chatlist.isEmpty
-                ? const Center(
-                    // child: CircularProgressIndicator(),
-                    )
-                : ListView.builder(
-                    itemCount: _chatlist.length,
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.only(top: 10, bottom: 10),
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) =>  Column(
-                      children: [
-                        Container(
+            Align(
+              child: _chatlist.isEmpty
+                  ? const Center(
+                      // child: CircularProgressIndicator(),
+                      )
+                  : ListView.builder(
+                      itemCount: _chatlist.length,
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.only(top: 10, bottom: 10),
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) =>  Column(
+                        children: [
+                          Container(
 
-                          padding: EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
-                          child: Align(
-                            alignment: Alignment.topRight,
-                            child:Container(
-                              padding: EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
-                              decoration: Styles.boxme,
-                              child: Text(_chatlist.isNotEmpty?_chatlist[index]['message']:"",
-                                style: TextStyle(fontSize: 15,color: Colors.white),),
+                            padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                            child: Align(
+                              alignment: Alignment.topRight,
+                              child:Container(
+                                padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                                margin: EdgeInsets.only(left: 44),
+                                decoration: Styles.boxme,
+                                child: Text(_chatlist.isNotEmpty?_chatlist[index]['message']:"",
+                                  style: const TextStyle(fontSize: 15,color: Colors.white),),
+                              ),
                             ),
                           ),
-                        ),
-                        Container(
+                          Container(
 
-                          padding: EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
-                          child: Align(
-                            alignment: Alignment.topLeft,
-                            child:Container(
-                              padding: EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
-                              decoration: Styles.boxsomebody,
-                              child: Text(_chatlist.isNotEmpty?_chatlist[index]['message']:"",
-                                style: TextStyle(fontSize: 15,color: Colors.black),),
+                            padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child:Container(
+                                padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                                margin: EdgeInsets.only(right: 44),
+                                decoration: Styles.boxsomebody,
+                                child: Text(_chatlist.isNotEmpty?"${_chatlist[index]['message']}":"",
+                                  style: const TextStyle(fontSize: 15,color: Colors.black),),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    )),
-          ),
-        ]));
+                        ],
+                      )),
+            ),
+          ]),
+        ));
   }
 }
 // FadeInImage(

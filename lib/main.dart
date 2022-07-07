@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flierdapp/colors/colors.dart';
 import 'package:flierdapp/ui/homepage/homepage.dart';
@@ -23,13 +22,13 @@ class MyApp extends StatelessWidget {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Column(children: [
-          Container(
+          SizedBox(
             height: MediaQuery.of(context).size.height * 4 / 5,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: const [
                 Text(
-                  ChatApp,
+                  appName,
                   style: TextStyle(
                       color: Colors.black,
                       fontSize: 32,
@@ -40,23 +39,23 @@ class MyApp extends StatelessWidget {
                   height: 20,
                 ),
                 Text(
-                  Confirmation_that_invitation_has_been_sent,
+                  confirmationNote,
                   style: TextStyle(color: Colors.black, fontSize: 14),
                   textAlign: TextAlign.center,
                 )
               ],
             ),
           ),
-          Container(
+          SizedBox(
             height: MediaQuery.of(context).size.height * 1 / 5,
             child: Column(
               children: [
                 Container(
                   width: MediaQuery.of(context).size.width,
-                  margin: EdgeInsets.fromLTRB(40, 0, 40, 0),
+                  margin: const EdgeInsets.fromLTRB(40, 0, 40, 0),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30.0),
-                    gradient: LinearGradient(
+                    gradient: const LinearGradient(
                       begin: Alignment(-0.95, 0.0),
                       end: Alignment(1.0, 0.0),
                       colors: [
@@ -86,21 +85,21 @@ class MyApp extends StatelessWidget {
                       //         builder: (context) => QuizPage()));
                     },
                     child: const Text(
-                      Continue_Swiping,
+                      continueSwiping,
                       style: TextStyle(color: Colors.white, fontSize: 14),
                       textAlign: TextAlign.center,
                     ),
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: TextButton(
                     onPressed: () {
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => HomePage()));
+                          MaterialPageRoute(builder: (context) => const HomePage()));
                     },
-                    child: Text(
-                      Go_to_chat,
+                    child: const Text(
+                      goChat,
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: 14,

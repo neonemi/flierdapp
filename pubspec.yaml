@@ -37,6 +37,7 @@ dependencies:
   back_button_interceptor:
   http:
   image_picker:
+  file_picker:
   sqflite:
 
 dev_dependencies:
