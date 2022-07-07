@@ -4,7 +4,9 @@ import 'package:flierdapp/ui/homepage/homepage.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
-  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: const MyApp()));
+  runApp(MaterialApp(
+      theme: ThemeData(fontFamily: "Pangram Sans"),
+      debugShowCheckedModeBanner: false, home: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
