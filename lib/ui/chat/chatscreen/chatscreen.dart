@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +12,7 @@ import '../../../colors/colors.dart';
 import '../../../db/db.dart';
 import '../../../utils/style.dart';
 import '../chatpage.dart';
+import 'audiorecord/audiorecord.dart';
 
 class ItemModel {
   String title;
@@ -455,7 +457,22 @@ class ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ),
-
+            // Container(
+            //   height: 30,
+            //   width:30,
+            //   child: Center(
+            //     child:
+            //          AudioRecorder(
+            //       onStop: (path) {
+            //         if (kDebugMode) print('Recorded file path: $path');
+            //         setState(() {
+            //           audioPath = path;
+            //           showPlayer = true;
+            //         });
+            //       },
+            //     ),
+            //   ),
+            // ),
           ],
         ),
         Column(
@@ -565,6 +582,7 @@ class ChatScreenState extends State<ChatScreen> {
               alignment: Alignment.bottomLeft,
               child: Container(
                 padding: const EdgeInsets.only(left: 22, bottom: 10, top: 10),
+                 margin: EdgeInsets.only(top: 100),
                 height: 80,
               
                 // width: double.infinity,
@@ -824,43 +842,46 @@ class ChatScreenState extends State<ChatScreen> {
                   ? const Center(
                       // child: CircularProgressIndicator(),
                       )
-                  : ListView.builder(
-                      itemCount: _chatlist.length,
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.only(top: 10, bottom: 10),
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) =>  Column(
-                        children: [
-                          Container(
+                  : Container(
+                margin:EdgeInsets.only(bottom: 80),
+                    child: ListView.builder(
+                        itemCount: _chatlist.length,
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.only(top: 10),
+                        physics: ClampingScrollPhysics(),
+                        itemBuilder: (context, index) =>  Column(
+                          children: [
+                            Container(
 
-                            padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
-                            child: Align(
-                              alignment: Alignment.topRight,
-                              child:Container(
-                                padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
-                                margin: EdgeInsets.only(left: 44),
-                                decoration: Styles.boxme,
-                                child: Text(_chatlist.isNotEmpty?_chatlist[index]['message']:"",
-                                  style: const TextStyle(fontSize: 15,color: Colors.white),),
+                              padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                              child: Align(
+                                alignment: Alignment.topRight,
+                                child:Container(
+                                  padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                                  margin: EdgeInsets.only(left: 44),
+                                  decoration: Styles.boxme,
+                                  child: Text(_chatlist.isNotEmpty?_chatlist[index]['message']:"",
+                                    style: const TextStyle(fontSize: 15,color: Colors.white),),
+                                ),
                               ),
                             ),
-                          ),
-                          Container(
+                            Container(
 
-                            padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
-                            child: Align(
-                              alignment: Alignment.topLeft,
-                              child:Container(
-                                padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
-                                margin: EdgeInsets.only(right: 44),
-                                decoration: Styles.boxsomebody,
-                                child: Text(_chatlist.isNotEmpty?"${_chatlist[index]['message']}":"",
-                                  style: const TextStyle(fontSize: 15,color: Colors.black),),
+                              padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                              child: Align(
+                                alignment: Alignment.topLeft,
+                                child:Container(
+                                  padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                                  margin: EdgeInsets.only(right: 44),
+                                  decoration: Styles.boxsomebody,
+                                  child: Text(_chatlist.isNotEmpty?"${_chatlist[index]['message']}":"",
+                                    style: const TextStyle(fontSize: 15,color: Colors.black),),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      )),
+                          ],
+                        )),
+                  ),
             ),
           ]),
         ));
