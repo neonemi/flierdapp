@@ -42,11 +42,13 @@ class ChatScreenState extends State<ChatScreen> {
   String fileType = 'All';
   var fileTypeList = ['All', 'Image', 'Video', 'Audio', 'MultipleFile'];
   var fileTypegallery = ['Image', 'Video'];
-
-  CustomPopupMenuController _controller = CustomPopupMenuController();
+  bool showPlayer = false;
+  String? audioPath;
+  bool visiblity=true;
+  CustomPopupMenuController controller = CustomPopupMenuController();
 
   void _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(allowMultiple: true,type:FileType.image );
+    final result = await FilePicker.platform.pickFiles(allowMultiple: true,type:FileType.any );
 
     setState(() {
       if (result != null) {
@@ -125,6 +127,7 @@ class ChatScreenState extends State<ChatScreen> {
     ItemModel('quote', Icons.format_quote),
     ItemModel('remind', Icons.add_alert),
     ItemModel('search', Icons.search),
+
   ];
 
   @override
@@ -153,7 +156,65 @@ class ChatScreenState extends State<ChatScreen> {
     ScaffoldMessenger.of(_scaffoldKey.currentContext!)
         .showSnackBar(SnackBar(content: Text(value)));
   }
+   camerachooser(BuildContext context) async{
+    AlertDialog alertDialog = AlertDialog(
+      content:   Container(
+        height: 150,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children:[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: ColorConstant.lightblue,
+                  onPrimary: Colors.white,
+                  elevation: 0,
+                  alignment: Alignment.center,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      side: BorderSide(
+                          color: ColorConstant.lightblue, width: 2)),
+                  fixedSize: const Size(165, 50),
+                  //////// HERE
+                ),
+                onPressed: getImagefromcamera,
+                child: Text(
+                  "Image",
+                  style: TextStyle(
+                      color:Colors.white,
+                      fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: ColorConstant.lightblue,
+                  onPrimary: Colors.white,
+                  elevation: 0,
+                  alignment: Alignment.center,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      side: BorderSide(
+                          color: ColorConstant.lightblue, width: 2)),
+                  fixedSize: const Size(165, 50),
+                  //////// HERE
+                ),
+                onPressed: getVideofromCamera,
+                child: Text(
+                  "Video",
+                  style: TextStyle(
+                      color:Colors.white,
+                      fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ]
+        ),
 
+      ),
+    );
+    showDialog(context: context, builder: (context)=>alertDialog);
+
+  }
   void chooser(BuildContext context) async {
     showModalBottomSheet(
         context: context,
@@ -277,40 +338,151 @@ class ChatScreenState extends State<ChatScreen> {
                   ]),
             ));
   }
-  Widget _buildLongPressMenu() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(5),
-      child: Container(
-        width: 220,
-        color: Colors.grey,
-        child: GridView.count(
-          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-          crossAxisCount: 5,
-          crossAxisSpacing: 0,
-          mainAxisSpacing: 10,
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          children: menuItems
-              .map((item) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(
-                item.icon,
-                size: 20,
-                color: Colors.white,
+  Widget _buildLongPressMenu(BuildContext context) {
+    return Container(
+      height: 65,
+      margin: EdgeInsets.fromLTRB(12, 0, 20, 0),
+      padding: EdgeInsets.only(left: 10,right: 4,top: 5,bottom: 10),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.white,
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(20),bottomRight: Radius.circular(20),topRight: Radius.circular(20) )
+
+      ),
+      child: GridView(
+        padding: EdgeInsets.symmetric(horizontal: 5,vertical: 15),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 5,
+          mainAxisSpacing: 5,
+          crossAxisSpacing: 5),
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      children: [
+        Column(
+          children: [
+            Container(
+              height: 25,
+              width: 40,
+
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                 color: ColorConstant.gradient2,
               ),
-              Container(
-                margin: EdgeInsets.only(top: 2),
-                child: Text(
-                  item.title,
-                  style: TextStyle(color: Colors.white, fontSize: 12),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(child: Image.asset("assets/images/plusicon.png",
+                      color: Colors.white,height: 20,width: 15,),),
+                    Container(child: Image.asset("assets/images/twodots.png",
+                      color: Colors.white,height: 20,width: 15,),)
+                  ],
                 ),
               ),
-            ],
-          ))
-              .toList(),
+            ),
+          ],
         ),
-      ),
+        Column(
+          children: [
+            GestureDetector(
+              onTap:() {
+
+                  camerachooser(context);
+
+
+               // Navigator.pop(context);
+              },
+              child: Container(
+                height: 30,
+                width:40,
+                // padding: const EdgeInsets.all(4),
+                // alignment: Alignment.center,
+                // decoration: BoxDecoration(
+                //   color: Colors.blue,
+                //   borderRadius: BorderRadius.circular(40),
+                // ),
+                child: const Icon(
+                  Icons.camera_alt,
+                  size: 30,
+                  color: ColorConstant.gradient2,
+                ),
+              ),
+            ),
+
+          ],
+        ),
+        Column(
+          children: [
+            GestureDetector(
+              onTap: getImagefromGallery,
+              child: Container(
+                height: 25,
+                width: 30,
+                alignment:Alignment.center,
+                decoration: BoxDecoration(
+                  color: ColorConstant.gradient2,
+                  borderRadius: BorderRadius.circular(5)
+                ),
+                child: Center(
+                  child: const Icon(
+                    Icons.gif,
+                    size: 28,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+
+          ],
+        ),
+        Column(
+          children: [
+            GestureDetector(
+              onTap: getVideofromCamera,
+              child: Container(
+                height: 30,
+                width:30,
+                // padding: const EdgeInsets.all(4),
+                // alignment: Alignment.center,
+                // decoration: BoxDecoration(
+                //   color: Colors.blue,
+                //   borderRadius: BorderRadius.circular(40),
+                // ),
+                child: const Icon(
+                  Icons.mic,
+                  size: 30,
+                  color: ColorConstant.gradient2,
+                ),
+              ),
+            ),
+
+          ],
+        ),
+        Column(
+          children: [
+            GestureDetector(
+              onTap: _pickFile,
+              child: Container(
+                height: 30,
+                width:30,
+                // padding: const EdgeInsets.all(4),
+                // alignment: Alignment.center,
+                // decoration: BoxDecoration(
+                //   color: Colors.blue,
+                //   borderRadius: BorderRadius.circular(40),
+                // ),
+                child: const Icon(
+                  Icons.attachment,
+                  size: 30,
+                  color: ColorConstant.gradient2,
+                ),
+              ),
+            ),
+
+          ],
+        ),
+        ],
+    ),
     );
   }
   @override
@@ -319,7 +491,7 @@ class ChatScreenState extends State<ChatScreen> {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey.shade100,
         key: _scaffoldKey,
        // resizeToAvoidBottomInset: false,
         appBar: AppBar(
@@ -387,24 +559,12 @@ class ChatScreenState extends State<ChatScreen> {
         ),
         body: Container(
           color:  Colors.grey.shade100,
-          // decoration: BoxDecoration(
-          //   borderRadius: BorderRadius.circular(30.0),
-          //   gradient:  LinearGradient(
-          //     begin: Alignment(-0.95, 0.0),
-          //     end: Alignment(1.0, 0.0),
-          //     colors: [
-          //       ColorConstant.bg1,
-          //       ColorConstant.bg2,
-          //     ],
-          //     stops: [0.0, 1.0],
-          //   ),
-          // ),
-          child: Stack(children: <Widget>[
 
+          child: Stack(children: <Widget>[
             Align(
               alignment: Alignment.bottomLeft,
               child: Container(
-                padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
+                padding: const EdgeInsets.only(left: 22, bottom: 10, top: 10),
                 height: 80,
               
                 // width: double.infinity,
@@ -412,40 +572,101 @@ class ChatScreenState extends State<ChatScreen> {
                 child: Row(
                   children: <Widget>[
                     CustomPopupMenu(
-                      menuBuilder: _buildLongPressMenu,
+                      enablePassEvent: true,
+                      controller: controller,
+                      menuBuilder:() {
+                      return  _buildLongPressMenu(context);
+                      },
                       barrierColor: Colors.transparent,
-                      pressType: PressType.longPress,
-                      child: Container(
-                        height: 60,
-                        width: 60,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Center(
-                          child: Container(
-                            height: 20,
-                            width: 30,
+                      pressType: PressType.singleClick,
+                      showArrow: false,
 
+                      verticalMargin: 0,
+                      child: GestureDetector(
+                         onTap: (){
+                           setState(()  {
+                             visiblity= !visiblity;
+                           });
+                           if(visiblity==false){
+                             controller.showMenu();
+                           }else{
+                             controller.hideMenu();
+                           }
+
+                         },
+                        child: Visibility(
+                          visible: visiblity,
+                          replacement:  Container(
+                            height: 60,
+                            width: 60,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              gradient:  LinearGradient(
-                                begin: Alignment(-0.95, 0.0),
-                                end: Alignment(1.0, 0.0),
-                                colors: [
-                                  ColorConstant.gradient2,
-                                  ColorConstant.gradient1,
-                                ],
-                                stops: [0.0, 1.0],
-                              ),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(bottomRight: Radius.circular(20),bottomLeft: Radius.circular(20))
+
                             ),
                             child: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(child: Image.asset("assets/images/plusicon.png",color: Colors.white,height: 20,width: 10,),),
-                                  Container(child: Image.asset("assets/images/twodots.png",color: Colors.white,height: 10,width: 10,),)
-                                ],
+                              child: Container(
+                                height: 20,
+                                width: 30,
+
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  gradient:  LinearGradient(
+                                    begin: Alignment(-0.95, 0.0),
+                                    end: Alignment(1.0, 0.0),
+                                    colors: [
+                                      ColorConstant.gradient2,
+                                      ColorConstant.gradient1,
+                                    ],
+                                    stops: [0.0, 1.0],
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(child: Image.asset("assets/images/plusicon.png",color: Colors.white,height: 20,width: 10,),),
+                                      Container(child: Image.asset("assets/images/twodots.png",color: Colors.white,height: 10,width: 10,),)
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          child: Container(
+                            height: 60,
+                            width: 60,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                                borderRadius: BorderRadius.all( Radius.circular(20))
+
+                            ),
+                            child: Center(
+                              child: Container(
+                                height: 20,
+                                width: 30,
+
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  gradient:  LinearGradient(
+                                    begin: Alignment(-0.95, 0.0),
+                                    end: Alignment(1.0, 0.0),
+                                    colors: [
+                                      ColorConstant.gradient2,
+                                      ColorConstant.gradient1,
+                                    ],
+                                    stops: [0.0, 1.0],
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(child: Image.asset("assets/images/plusicon.png",color: Colors.white,height: 20,width: 10,),),
+                                      Container(child: Image.asset("assets/images/twodots.png",color: Colors.white,height: 10,width: 10,),)
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -459,61 +680,138 @@ class ChatScreenState extends State<ChatScreen> {
                       ),
                     ),
                     Expanded(
-                      child: Container(
-                        height: 80,
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(topLeft: Radius.circular(30),topRight: Radius.circular(30))
-                        ),
-                        child: TextField(
-                          controller: _messageController,
-                          cursorColor: Colors.black,
-                          keyboardType: TextInputType.multiline,
-                          textInputAction: TextInputAction.done,
-                          maxLines: null,
+                      child: Visibility(
+                        visible: visiblity,
+                        replacement: Container(
+                          height: 80,
+                            margin: const EdgeInsets.only( top: 10),
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(topLeft: Radius.circular(20),bottomLeft: Radius.circular(20))
+                          ),
+                          child: TextField(
+                            controller: _messageController,
+                            cursorColor: Colors.black,
+                            keyboardType: TextInputType.multiline,
+                            textInputAction: TextInputAction.done,
+                            maxLines: null,
 
-                          // onChanged: (value){
-                          //   _messageController.text=value;
-                          // },
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(10),
-                            filled: true,
-                              fillColor: Colors.white,
+                            // onChanged: (value){
+                            //   _messageController.text=value;
+                            // },
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10),
+
                               hintText: "Write message...",
                               hintStyle: TextStyle(color: Colors.black54),
                               border: InputBorder.none,
 
 
+                            ),
+                            // keyboardType: TextInputType.text,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.singleLineFormatter
+                            ],
                           ),
-                          // keyboardType: TextInputType.text,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.singleLineFormatter
-                          ],
+                        ),
+                        child: Container(
+                          height: 80,
+                        //  margin: const EdgeInsets.only( top: 10),
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(topLeft: Radius.circular(20),bottomLeft: Radius.circular(20))
+                          ),
+                          child: TextField(
+                            controller: _messageController,
+                            cursorColor: Colors.black,
+                            keyboardType: TextInputType.multiline,
+                            textInputAction: TextInputAction.done,
+                            maxLines: null,
+
+                            // onChanged: (value){
+                            //   _messageController.text=value;
+                            // },
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10),
+
+                                hintText: "Write message...",
+                                hintStyle: TextStyle(color: Colors.black54),
+                                border: InputBorder.none,
+
+
+                            ),
+                            // keyboardType: TextInputType.text,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.singleLineFormatter
+                            ],
+                          ),
                         ),
                       ),
                     ),
                  SizedBox(
                       width: 15,
-                   child: Container(
-                     color: Colors.white,
+                   child: Visibility(
+                     visible: visiblity,
+                     replacement: Container(
+                        margin: const EdgeInsets.only( top: 10),
+                       color: Colors.white,
+                     ),
+                     child: Container(
+                      // margin: const EdgeInsets.only( top: 10),
+                       color: Colors.white,
+                     ),
                    ),
                     ),
-                    Container(
-                      color: Colors.white,
+                    Visibility(
+                      visible: visiblity,
+                      replacement:    Container(
+                        margin: EdgeInsets.only(right: 10,top: 10),
+                        //  color: Colors.white,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(topRight: Radius.circular(20),bottomRight: Radius.circular(20))
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.all(8),
+                          child: FloatingActionButton(
+                              onPressed: () async {
+                                await _addItem();
+                              },
+                              backgroundColor: Colors.grey.shade100,
+                              elevation: 0,
+                              child:Container(
+                                  padding: EdgeInsets.all(2),
+                                  height: 50,width: 30,
+                                  child:Image.asset("assets/images/sendicon.png",
+                                    color: Colors.grey,height: 30,width: 30,))
+                          ),
+                        ),
+                      ),
                       child: Container(
-                        padding: EdgeInsets.all(8),
-                        child: FloatingActionButton(
-                          onPressed: () async {
-                            await _addItem();
-                          },
-                          backgroundColor: Colors.grey.shade100,
-                          elevation: 0,
-                          child:Container(
-                              padding: EdgeInsets.all(2),
-                              height: 50,width: 30,
-                              child:Image.asset("assets/images/sendicon.png",color: ColorConstant.lightblue,height: 30,width: 30,))
+                        margin: EdgeInsets.only(right: 10),
+                      //  color: Colors.white,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(topRight: Radius.circular(20),bottomRight: Radius.circular(20))
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.all(8),
+                          child: FloatingActionButton(
+                            onPressed: () async {
+                              await _addItem();
+                            },
+                            backgroundColor: Colors.grey.shade100,
+                            elevation: 0,
+                            child:Container(
+                                padding: EdgeInsets.all(2),
+                                height: 50,width: 30,
+                                child:Image.asset("assets/images/sendicon.png",
+                                  color: Colors.grey,height: 30,width: 30,))
+                          ),
                         ),
                       ),
                     ),
