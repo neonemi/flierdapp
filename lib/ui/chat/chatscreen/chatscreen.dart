@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../colors/colors.dart';
 import '../../../db/db.dart';
+import '../../../model/chatmessage.dart';
 import '../../../utils/style.dart';
 import '../chatpage.dart';
 import 'audiorecord/audiorecord.dart';
@@ -27,7 +28,7 @@ class ChatScreen extends StatefulWidget {
   ChatScreenState createState() => ChatScreenState();
 }
 
-class ChatScreenState extends State<ChatScreen> {
+class ChatScreenState extends State<ChatScreen> with ChangeNotifier{
   final TextEditingController _messageController = TextEditingController();
   // VideoPlayerController? _cameraVideoPlayerController;
   // VideoPlayerController? _videoPlayerController;
@@ -131,7 +132,14 @@ class ChatScreenState extends State<ChatScreen> {
     ItemModel('search', Icons.search),
 
   ];
-
+List<ChatMessage> messages = [
+  ChatMessage(messageContent: "Hello, Will", messageType: "receiver"),
+  ChatMessage(messageContent: "How have you been?", messageType: "receiver"),
+  ChatMessage(messageContent: "Hey Hello, I am doing fine dude. wbu?", messageType: "sender"),
+  ChatMessage(messageContent: "ehhhh, doing OK.", messageType: "receiver"),
+  ChatMessage(messageContent: "Is there any thing wrong?", messageType: "sender"),
+];
+List<String>? message =[].cast<String>().toList(growable: true);
   @override
   void initState() {
     super.initState();
@@ -340,6 +348,8 @@ class ChatScreenState extends State<ChatScreen> {
                   ]),
             ));
   }
+  DateTime time = DateTime.now();
+  List<DateTime>? msgtime = [].cast<DateTime>().toList(growable: true);
   Widget _buildLongPressMenu(BuildContext context) {
     return Container(
       height: 65,
@@ -502,9 +512,12 @@ class ChatScreenState extends State<ChatScreen> {
     ),
     );
   }
+  ScrollController _scrollController = new ScrollController();
   @override
   Widget build(BuildContext context) {
     log(_chatlist.toString());
+    log(message.toString());
+    log(msgtime.toString());
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     return Scaffold(
@@ -584,7 +597,7 @@ class ChatScreenState extends State<ChatScreen> {
                 padding: const EdgeInsets.only(left: 22, bottom: 10, top: 10),
                  margin: EdgeInsets.only(top: 100),
                 height: 80,
-              
+
                 // width: double.infinity,
                 color:  Colors.grey.shade100,
                 child: Row(
@@ -797,7 +810,17 @@ class ChatScreenState extends State<ChatScreen> {
                           padding: EdgeInsets.all(8),
                           child: FloatingActionButton(
                               onPressed: () async {
-                                await _addItem();
+                                setState((){
+                                  message!.add(_messageController.text);
+                                  msgtime!.add(DateTime.now());
+                                });
+                                _scrollController.animateTo(
+                                  0.0,
+                                  curve: Curves.easeOut,
+                                  duration: const Duration(milliseconds: 300),
+                                );
+                              //  updateData(message!);
+                              //  await _addItem();
                               },
                               backgroundColor: Colors.grey.shade100,
                               elevation: 0,
@@ -820,7 +843,17 @@ class ChatScreenState extends State<ChatScreen> {
                           padding: EdgeInsets.all(8),
                           child: FloatingActionButton(
                             onPressed: () async {
-                              await _addItem();
+                              setState((){
+                                message!.add(_messageController.text);
+                                msgtime!.add(DateTime.now());
+                              });
+                              // _scrollController.animateTo(
+                              //   0.0,
+                              //   curve: Curves.easeOut,
+                              //   duration: const Duration(milliseconds: 300),
+                              // );
+                             // updateData(message!);
+                              // await _addItem();
                             },
                             backgroundColor: Colors.grey.shade100,
                             elevation: 0,
@@ -838,54 +871,71 @@ class ChatScreenState extends State<ChatScreen> {
               ),
             ),
             Align(
-              child: _chatlist.isEmpty
+              child: message!.isEmpty
                   ? const Center(
                       // child: CircularProgressIndicator(),
                       )
                   : Container(
                 margin:EdgeInsets.only(bottom: 80),
                     child: ListView.builder(
-                        itemCount: _chatlist.length,
+                        itemCount: message!.length,
                         shrinkWrap: true,
+                        //controller: _scrollController,
                         padding: const EdgeInsets.only(top: 10),
                         physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) =>  Column(
                           children: [
                             Container(
-
-                              padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                              padding: const EdgeInsets.only(left: 14,right: 14,top: 14,bottom: 14),
                               child: Align(
                                 alignment: Alignment.topRight,
                                 child:Container(
-                                  padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                                  padding: const EdgeInsets.only(left: 14,right: 14,top: 14,bottom: 14),
                                   margin: EdgeInsets.only(left: 44),
                                   decoration: Styles.boxme,
-                                  child: Text(_chatlist.isNotEmpty?_chatlist[index]['message']:"",
-                                    style: const TextStyle(fontSize: 15,color: Colors.white),),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text("${msgtime![index].hour.toString().padLeft(2,'')}:${msgtime![index].minute.toString().padLeft(2,'')}",
+                                        style:  TextStyle(fontSize: 12,color: Colors.grey)),
+                                      SizedBox(height: 5,),
+                                      Text(message![index],
+                                        style: const TextStyle(fontSize: 15,color: Colors.white),textAlign: TextAlign.left,),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            Container(
-
-                              padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child:Container(
-                                  padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
-                                  margin: EdgeInsets.only(right: 44),
-                                  decoration: Styles.boxsomebody,
-                                  child: Text(_chatlist.isNotEmpty?"${_chatlist[index]['message']}":"",
-                                    style: const TextStyle(fontSize: 15,color: Colors.black),),
-                                ),
-                              ),
-                            ),
+                            )
+                            // Container(
+                            //
+                            //   padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                            //   child: Align(
+                            //     alignment: Alignment.topLeft,
+                            //     child:Container(
+                            //       padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
+                            //       margin: EdgeInsets.only(right: 44),
+                            //       decoration: Styles.boxsomebody,
+                            //       child: Text(messages[index].messageContent,
+                            //         style: const TextStyle(fontSize: 15,color: Colors.black),),
+                            //     ),
+                            //   ),
+                            // ),
                           ],
-                        )),
+                        )
+                    ),
                   ),
             ),
           ]),
         ));
   }
+  void updateData(List<String> message) {
+    setState(() {
+      message.addAll(message);
+    });
+
+    notifyListeners(); // To rebuild the Widget
+  }
+
 }
 // FadeInImage(
 // placeholder: const FileImage(pathToFile),
