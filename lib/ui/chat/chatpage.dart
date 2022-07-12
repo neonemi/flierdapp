@@ -1,13 +1,18 @@
+import 'dart:convert';
+
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../colors/colors.dart';
 import '../../main.dart';
+import '../../model/GetChatUsers.dart';
 import 'chatscreen/chatscreen.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key}) : super(key: key);
+  final  cameras;
+  ChatPage({Key? key,this.cameras}) : super(key: key);
 
   @override
   ChatPageState createState() => ChatPageState();
@@ -15,6 +20,8 @@ class ChatPage extends StatefulWidget {
 
 class ChatPageState extends State<ChatPage> with ChangeNotifier {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  var chatnotstarted ;
+  var chatusers ;
   final List<Map<String, String>> listOfColumns = [
     {
       "name": "abc",
@@ -45,11 +52,41 @@ class ChatPageState extends State<ChatPage> with ChangeNotifier {
       "message": "hi",
     },
   ];
+  var chatdata;
+  var userapidata;
+  void getChatUsers() async {
+    http.Response response =
+    await http.get(Uri.parse("https://mvendorshop.askme.im/api/v1/chat-users"));
+    var jsonResponse = convert.jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      if (jsonResponse['success'] == true) {
+        chatdata = response.body;
+        setState(() {
+          chatdata = response.body;
+          userapidata = jsonDecode(chatdata!)['data'];
+          chatnotstarted =
+          jsonDecode(chatdata!)['data']['chat_not_started_yet_users'];
+          chatusers = jsonDecode(chatdata!)['data']['chat_with_users'];
+        });
+        var venam = jsonDecode(chatdata!)['data']['chat_not_started_yet_users']
+            .toString();
+        var venamid = jsonDecode(chatdata!)['data']['chat_with_users']
+            .toString();
+        print(venam.toString());
+        print(venamid.toString());
+      }else{
+
+      }
+    }else {
+      print(response.statusCode);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-
     BackButtonInterceptor.add(myInterceptor);
+    getChatUsers();
   }
 
   @override
@@ -60,7 +97,7 @@ class ChatPageState extends State<ChatPage> with ChangeNotifier {
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const MyApp()));
+        context, MaterialPageRoute(builder: (context) =>  MyApp(cameras: widget.cameras,)));
     // Do some stuff.
     return true;
   }
@@ -115,14 +152,15 @@ class ChatPageState extends State<ChatPage> with ChangeNotifier {
               ))
         ],
       ),
-      body: Stack(
+      body:userapidata==null?Container(
+        child: Center(child: CircularProgressIndicator()),): Stack(
         children: [
-          Container(
+          chatnotstarted==null?Container():  Container(
             height: 120,
             alignment: Alignment.center,
             child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: listOfColumns.length,
+                itemCount: chatnotstarted.length,
                 itemBuilder: (context, index) {
                   return Container(
                     width: 70,
@@ -134,10 +172,9 @@ class ChatPageState extends State<ChatPage> with ChangeNotifier {
                           width: 70,
                           height: 70,
                           decoration: BoxDecoration(
-                              color: Colors.yellow,
                               borderRadius: BorderRadius.circular(70),
-                              image: const DecorationImage(
-                                  image: AssetImage("assets/images/dummy.png"),
+                              image:  DecorationImage(
+                                  image: NetworkImage(chatnotstarted[index]['profile_pic_url']),
                                   fit: BoxFit.fill)),
                           // child: CircleAvatar(
                           //   backgroundColor: Colors.pink,
@@ -145,7 +182,7 @@ class ChatPageState extends State<ChatPage> with ChangeNotifier {
                           // ),
                         ),
                         Text(
-                          "${listOfColumns[index]['name']}",
+                          "${chatnotstarted[index]['name']}",
                           style: const TextStyle(
                               color: Colors.black, fontSize: 14),
                         )
@@ -161,17 +198,17 @@ class ChatPageState extends State<ChatPage> with ChangeNotifier {
               color: Colors.grey,
             ),
           ),
-          Container(
+          chatusers==null?Container(): Container(
               margin: const EdgeInsets.fromLTRB(0, 120, 0, 0),
               child: ListView.builder(
-                itemCount: listOfColumns.length,
+                itemCount: chatusers.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const ChatScreen()));
+                              builder: (context) =>  ChatScreen(cameras: widget.cameras,)));
                     },
                     child: Container(
                       margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
@@ -190,11 +227,10 @@ class ChatPageState extends State<ChatPage> with ChangeNotifier {
                                     width: 90,
                                     height: 90,
                                     decoration: BoxDecoration(
-                                        color: Colors.red,
                                         borderRadius: BorderRadius.circular(20),
-                                        image: const DecorationImage(
-                                            image: AssetImage(
-                                                "assets/images/dummy.png"),
+                                        image:  DecorationImage(
+                                            image:NetworkImage(chatusers[index]['profile_pic_url']),
+                                               // : AssetImage("assets/images/dummy.png"),
                                             fit: BoxFit.fill)),
                                     child: Container(),
                                   ),
@@ -209,10 +245,12 @@ class ChatPageState extends State<ChatPage> with ChangeNotifier {
                                           borderRadius:
                                               BorderRadius.circular(40),
                                         ),
-                                        child: const Icon(
+                                        child:
+                                        const Icon(
                                           Icons.remove_red_eye_rounded,
                                           color: Colors.white,
-                                        )),
+                                        )
+                                    ),
                                   ),
                                 ],
                               ),
@@ -248,7 +286,7 @@ class ChatPageState extends State<ChatPage> with ChangeNotifier {
                                       alignment: Alignment.centerLeft,
                                       child: ListTile(
                                         title: Text(
-                                          "${listOfColumns[index]['name']}",
+                                          "${chatusers[index]['name']}",
                                           style: const TextStyle(
                                               color: Colors.black,
                                               fontWeight: FontWeight.bold),

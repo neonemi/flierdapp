@@ -7,13 +7,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../colors/colors.dart';
 import '../../../db/db.dart';
 import '../../../model/chatmessage.dart';
 import '../../../utils/style.dart';
 import '../chatpage.dart';
-import 'audiorecord/audiorecord.dart';
+import 'camera/camerascreen.dart';
+
 
 class ItemModel {
   String title;
@@ -22,7 +24,11 @@ class ItemModel {
   ItemModel(this.title, this.icon);
 }
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  final cameras;
+  String? imagePath;
+  String? videopath;
+  VideoPlayerController? videoController;
+  ChatScreen({Key? key,this.cameras,this.videopath,this.videoController,this.imagePath}) : super(key: key);
 
   @override
   ChatScreenState createState() => ChatScreenState();
@@ -157,7 +163,7 @@ List<String>? message =[].cast<String>().toList(growable: true);
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const ChatPage()));
+        context, MaterialPageRoute(builder: (context) =>  ChatPage()));
     // Do some stuff.
     return true;
   }
@@ -399,10 +405,10 @@ List<String>? message =[].cast<String>().toList(growable: true);
             GestureDetector(
               onTap:() {
 
-                  camerachooser(context);
-
-
-               // Navigator.pop(context);
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CameraApp(cameras: widget.cameras,)));
               },
               child: Container(
                 height: 30,
@@ -467,22 +473,6 @@ List<String>? message =[].cast<String>().toList(growable: true);
                 ),
               ),
             ),
-            // Container(
-            //   height: 30,
-            //   width:30,
-            //   child: Center(
-            //     child:
-            //          AudioRecorder(
-            //       onStop: (path) {
-            //         if (kDebugMode) print('Recorded file path: $path');
-            //         setState(() {
-            //           audioPath = path;
-            //           showPlayer = true;
-            //         });
-            //       },
-            //     ),
-            //   ),
-            // ),
           ],
         ),
         Column(
@@ -492,12 +482,6 @@ List<String>? message =[].cast<String>().toList(growable: true);
               child: Container(
                 height: 30,
                 width:30,
-                // padding: const EdgeInsets.all(4),
-                // alignment: Alignment.center,
-                // decoration: BoxDecoration(
-                //   color: Colors.blue,
-                //   borderRadius: BorderRadius.circular(40),
-                // ),
                 child: const Icon(
                   Icons.attachment,
                   size: 30,
@@ -518,6 +502,9 @@ List<String>? message =[].cast<String>().toList(growable: true);
     log(_chatlist.toString());
     log(message.toString());
     log(msgtime.toString());
+    log(widget.videopath.toString());
+    log(widget.imagePath.toString());
+    log(widget.videoController.toString());
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     return Scaffold(
@@ -538,7 +525,7 @@ List<String>? message =[].cast<String>().toList(growable: true);
                   IconButton(
                     onPressed: () {
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => const ChatPage()));
+                          MaterialPageRoute(builder: (context) =>  ChatPage(cameras: widget.cameras,)));
                     },
                     icon: const Icon(
                       Icons.arrow_back_ios,

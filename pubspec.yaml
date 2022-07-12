@@ -41,6 +41,9 @@ dependencies:
   sqflite:
   custom_pop_up_menu: ^1.2.4
   record: ^4.3.0
+  flutter_better_camera:
+  video_player:
+  path_provider:
 dev_dependencies:
   flutter_test:
     sdk: flutter

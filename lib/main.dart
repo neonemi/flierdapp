@@ -4,15 +4,20 @@ import 'package:flierdapp/ui/chat/chatpage.dart';
 
 import 'package:flierdapp/utils/string.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_better_camera/camera.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Obtain a list of the available cameras on the device.
+  final cameras = await availableCameras();
   runApp(MaterialApp(
       theme: ThemeData(fontFamily: "Pangram Sans"),
-      debugShowCheckedModeBanner: false, home: const MyApp()));
+      debugShowCheckedModeBanner: false, home:  MyApp(cameras: cameras,)));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final  cameras;
+  MyApp({Key? key,this.cameras}) : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -97,7 +102,7 @@ class MyApp extends StatelessWidget {
                   child: TextButton(
                     onPressed: () {
                       Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => const ChatPage()));
+                          MaterialPageRoute(builder: (context) => ChatPage(cameras: cameras,)));
                     },
                     child: const Text(
                       goChat,
