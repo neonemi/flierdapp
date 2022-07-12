@@ -9,7 +9,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:back_button_interceptor/back_button_interceptor.dart';
-import 'package:flierdapp/ui/chat/chatscreen/camera/videosend.dart';
+import 'package:flierdapp/ui/chat/chatscreen/camera/mediasend.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -313,7 +313,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
 
   void showInSnackBar(String message) {
-    _scaffoldKey.currentState!.showSnackBar(SnackBar(content: Text(message,style: TextStyle(fontSize: 10),)));
+    ScaffoldMessenger.of( _scaffoldKey.currentContext!).showSnackBar(SnackBar(content: Text(message,style: TextStyle(fontSize: 10),)));
   }
   void onNewCameraSelected(CameraDescription? cameraDescription) async {
     if (controller != null) {
