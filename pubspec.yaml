@@ -36,7 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   back_button_interceptor:
   http:
-  image_picker:
+  image_picker: ^0.8.5+3
   file_picker:
   sqflite:
   custom_pop_up_menu: ^1.2.4
@@ -44,6 +44,7 @@ dependencies:
   flutter_better_camera:
   video_player:
   path_provider:
+  just_audio:
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -41,8 +41,8 @@ class _CameraSendState extends State<CameraSend> {
 
   @override
   void dispose() {
-    widget.videoController?.dispose();
     BackButtonInterceptor.remove(myInterceptor);
+    widget.videoController?.dispose();
     super.dispose();
   }
 
@@ -64,12 +64,14 @@ class _CameraSendState extends State<CameraSend> {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     return Scaffold(
+      backgroundColor: Colors.black,
       key: _scaffoldKey,
       body: Stack(
         children: <Widget>[
       Align(
       alignment: Alignment.bottomRight,
         child: Container(
+          color: Colors.black,
           margin: EdgeInsets.fromLTRB(5, 5, 5, 20),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -84,6 +86,7 @@ class _CameraSendState extends State<CameraSend> {
                 child: ( widget.videoController == null)
                     ? Image.file(File( widget.imagePath!))
                     : Container(
+                  color: Colors.black,
                   // decoration: BoxDecoration(
                   //     border: Border.all(color: Colors.pink)),
                   child: Center(
@@ -100,12 +103,12 @@ class _CameraSendState extends State<CameraSend> {
           ),
         ),
       ),
-          _captureControlRowWidget()
+          _buttonRowWidget()
         ],
       ),
     );
   }
-  Widget _captureControlRowWidget() {
+  Widget _buttonRowWidget() {
     return Align(
        alignment: Alignment.bottomRight,
       child: Container(
@@ -140,9 +143,6 @@ class _CameraSendState extends State<CameraSend> {
       ),
     );
   }
-
-
-
 
 }
 

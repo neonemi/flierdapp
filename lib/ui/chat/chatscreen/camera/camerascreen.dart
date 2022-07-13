@@ -7,7 +7,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flierdapp/ui/chat/chatscreen/camera/mediasend.dart';
 import 'package:flutter/services.dart';
@@ -15,9 +14,7 @@ import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
-
 import '../chatscreen.dart';
-
 
 class CameraApp extends StatelessWidget {
   final List<CameraDescription> cameras;
@@ -27,10 +24,12 @@ class CameraApp extends StatelessWidget {
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-    return CameraExampleHome(cameras: cameras,);
-
+    return CameraExampleHome(
+      cameras: cameras,
+    );
   }
 }
+
 /// Returns a suitable camera icon for [direction].
 IconData getCameraLensIcon(CameraLensDirection? direction) {
   switch (direction) {
@@ -41,7 +40,8 @@ IconData getCameraLensIcon(CameraLensDirection? direction) {
       return Icons.camera_front;
     case CameraLensDirection.external:
       return Icons.camera;
-    default:CameraLensDirection.back;
+    default:
+      CameraLensDirection.back;
   }
   throw ArgumentError('Unknown lens direction');
 }
@@ -52,13 +52,12 @@ void logError(String code, String? message) =>
 class CameraExampleHome extends StatefulWidget {
   var cameras;
 
-  CameraExampleHome({Key? key,required this.cameras}) : super(key: key);
+  CameraExampleHome({Key? key, required this.cameras}) : super(key: key);
   @override
   _CameraExampleHomeState createState() {
     return _CameraExampleHomeState();
   }
 }
-
 
 class _CameraExampleHomeState extends State<CameraExampleHome>
     with WidgetsBindingObserver {
@@ -70,6 +69,10 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   bool enableAudio = true;
   FlashMode flashMode = FlashMode.off;
   int selectedCamera = 0;
+  Stream<int>? timerStream;
+  StreamSubscription<int>? timerSubscription;
+  String minutesStr = '00';
+  String secondsStr = '00';
   @override
   void initState() {
     super.initState();
@@ -86,11 +89,13 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     super.dispose();
   }
 
-
-
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras,)));
+        context,
+        MaterialPageRoute(
+            builder: (context) => ChatScreen(
+                  cameras: widget.cameras,
+                )));
     // Do some stuff.
     return true;
   }
@@ -140,15 +145,26 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
               decoration: BoxDecoration(
                 color: Colors.black,
                 border: Border.all(
-                  color: controller != null && controller!.value.isRecordingVideo!
-                      ? Colors.redAccent
-                      : Colors.grey,
+                  color:
+                      controller != null && controller!.value.isRecordingVideo!
+                          ? Colors.redAccent
+                          : Colors.grey,
                   width: 3.0,
                 ),
               ),
             ),
           ),
           _captureControlRowWidget(),
+          if (controller!.value.isRecordingVideo == true)
+            Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                  margin: const EdgeInsets.only(top: 30),
+                  child: Text(
+                    '$minutesStr:$secondsStr',
+                    style: const TextStyle(color: Colors.red),
+                  )),
+            )
         ],
       ),
     );
@@ -158,7 +174,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   Widget _cameraPreviewWidget() {
     if (controller == null || !controller!.value.isInitialized!) {
       return const Text(
-        'Tap a camera',
+        '',
         style: TextStyle(
           color: Colors.white,
           fontSize: 24.0,
@@ -199,31 +215,33 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     return Align(
       alignment: Alignment.bottomRight,
       child: Container(
-        margin: EdgeInsets.fromLTRB(5, 5, 5, 20),
+        margin: const EdgeInsets.fromLTRB(5, 5, 5, 20),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             videoController == null && imagePath == null
-                ? Container( width: 64.0,
-              height: 64.0,)
+                ? const SizedBox(
+                    width: 64.0,
+                    height: 64.0,
+                  )
                 : SizedBox(
-              width: 64.0,
-              height: 64.0,
-              child: (videoController == null)
-                  ? Image.file(File(imagePath!))
-                  : Container(
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.pink)),
-                child: Center(
-                  child: AspectRatio(
-                      aspectRatio:
-                      videoController!.value.size != null
-                          ? videoController!.value.aspectRatio
-                          : 1.0,
-                      child: VideoPlayer(videoController!)),
-                ),
-              ),
-            ),
+                    width: 64.0,
+                    height: 64.0,
+                    child: (videoController == null)
+                        ? Image.file(File(imagePath!))
+                        : Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.pink)),
+                            child: Center(
+                              child: AspectRatio(
+                                  aspectRatio:
+                                      videoController!.value.size != null
+                                          ? videoController!.value.aspectRatio
+                                          : 1.0,
+                                  child: VideoPlayer(videoController!)),
+                            ),
+                          ),
+                  ),
           ],
         ),
       ),
@@ -233,88 +251,101 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   /// Display the control bar with buttons to take pictures and record videos.
   Widget _captureControlRowWidget() {
     return Align(
-     // alignment: Alignment.bottomCenter,
+      // alignment: Alignment.bottomCenter,
       child: Container(
-        margin: EdgeInsets.only(bottom: 10),
+        margin: const EdgeInsets.only(bottom: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-         crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
             GestureDetector(
-              onTap:(){
+              onTap: () {
                 if (widget.cameras.length > 1) {
                   setState(() {
-                    selectedCamera = selectedCamera == 0 ? 1 : 0;//Switch camera
+                    selectedCamera =
+                        selectedCamera == 0 ? 1 : 0; //Switch camera
                     onNewCameraSelected(widget.cameras[selectedCamera]);
                   });
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text('No secondary camera found'),
-                    duration: const Duration(seconds: 2),
+                    duration: Duration(seconds: 2),
                   ));
                 }
               },
               child: Container(
                 height: 60,
                 width: 60,
-
-                margin: EdgeInsets.fromLTRB(5, 5, 5, 30),
-                // decoration: BoxDecoration(
-                //  shape: BoxShape.circle,
-                //   border: Border.all(color: Colors.white),
-                //
-                // ),
-                child: Icon(Icons.cameraswitch, color: Colors.white),
-
+                margin: const EdgeInsets.fromLTRB(5, 5, 5, 30),
+                child: const Icon(Icons.cameraswitch, color: Colors.white),
               ),
             ),
             Container(
-              margin: EdgeInsets.fromLTRB(5, 5, 5, 10),
+              margin: const EdgeInsets.fromLTRB(5, 5, 5, 10),
               child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       log('tap');
                       onTakePictureButtonPressed();
-                      },
-                    onLongPressStart:(value){
+                    },
+                    onLongPressStart: (value) {
                       log('start');
                       onVideoRecordButtonPressed();
                     },
-                    onLongPressEnd:(value){
+                    onLongPressEnd: (value) {
                       log('stop');
                       onStopButtonPressed();
-        },
+                    },
                     child: Container(
                       height: 60,
                       width: 60,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.white),
-                          shape: BoxShape.circle,
-
+                        shape: BoxShape.circle,
                       ),
-                      child: Icon(controller!.value.isRecordingVideo==true?Icons.stop:Icons.camera_alt,color: controller!.value.isRecordingVideo==true?Colors.red:Colors.white,),
+                      child: Icon(
+                        controller!.value.isRecordingVideo == true
+                            ? Icons.stop
+                            : Icons.camera_alt,
+                        color: controller!.value.isRecordingVideo == true
+                            ? Colors.red
+                            : Colors.white,
+                      ),
                     ),
                   ),
                   Container(
-                      padding: EdgeInsets.only(top: 5),
-                      child: Text("Tap to capture, Press to record",style: TextStyle(fontSize: 12,color: Colors.white),))
+                      padding: const EdgeInsets.only(top: 5),
+                      child: const Text(
+                        "Tap to capture, Press to record",
+                        style: TextStyle(fontSize: 12, color: Colors.white),
+                      ))
                 ],
               ),
             ),
-            _thumbnailWidget(),
+            const SizedBox(
+              width: 64.0,
+              height: 64.0,
+            )
+            // _thumbnailWidget(),
           ],
         ),
       ),
     );
   }
+
   String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
 
   void showInSnackBar(String message) {
-    ScaffoldMessenger.of( _scaffoldKey.currentContext!).showSnackBar(SnackBar(content: Text(message,style: TextStyle(fontSize: 10),)));
+    ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(SnackBar(
+        content: Text(
+      message,
+      style: const TextStyle(fontSize: 10),
+    )));
   }
+
   void onNewCameraSelected(CameraDescription? cameraDescription) async {
     if (controller != null) {
       await controller!.dispose();
@@ -354,9 +385,16 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
         });
         if (filePath != null) {
           Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) =>  CameraSend(cameras: widget.cameras, imagePath: filePath, videoController: null, videopath: null,)));
+              context,
+              MaterialPageRoute(
+                  builder: (context) => CameraSend(
+                        cameras: widget.cameras,
+                        imagePath: filePath,
+                        videoController: null,
+                        videopath: null,
+                      )));
 
-          showInSnackBar('Picture saved to $filePath');
+          // showInSnackBar('Picture saved to $filePath');
         }
       }
     });
@@ -364,10 +402,12 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 
   void onVideoRecordButtonPressed() {
     startVideoRecording().then((String? filePath) {
-      if (mounted) setState(() {});
-      if (filePath != null){
+      if (mounted) {
+        setState(() {});
+      }
+      if (filePath != null) {
         HapticFeedback.vibrate();
-        showInSnackBar('Saving video to $filePath');
+        // showInSnackBar('Saving video to $filePath');
       }
     });
   }
@@ -377,9 +417,16 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       if (mounted) setState(() {});
       {
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) =>  CameraSend(cameras: widget.cameras, imagePath: null, videoController: videoController, videopath: videoPath,)));
+            context,
+            MaterialPageRoute(
+                builder: (context) => CameraSend(
+                      cameras: widget.cameras,
+                      imagePath: null,
+                      videoController: videoController,
+                      videopath: videoPath,
+                    )));
 
-        showInSnackBar('Video recorded to: $videoPath');
+        //  showInSnackBar('Video recorded to: $videoPath');
       }
     });
   }
@@ -387,7 +434,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   void onPauseButtonPressed() {
     pauseVideoRecording().then((_) {
       if (mounted) setState(() {});
-      showInSnackBar('Video recording paused');
+      //showInSnackBar('Video recording paused');
     });
   }
 
@@ -403,11 +450,55 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     showInSnackBar('Toogle auto focus');
   }
 
+// Handle timeStream
+
+  Stream<int> stopWatchStream() {
+    StreamController<int>? streamController;
+    Timer? timer;
+    Duration timerInterval = const Duration(seconds: 1);
+    int counter = 0;
+
+    void stopTimer() {
+      if (timer != null) {
+        timer!.cancel();
+        timer = null;
+        counter = 0;
+        streamController!.close();
+      }
+    }
+
+    void tick(_) {
+      counter = counter + 1;
+      streamController!.add(counter);
+      //stopTimer();
+    }
+
+    void startTimer() {
+      timer = Timer.periodic(timerInterval, tick);
+    }
+
+    streamController = StreamController<int>(
+      onListen: startTimer,
+      onCancel: stopTimer,
+      onResume: startTimer,
+      onPause: stopTimer,
+    );
+
+    return streamController.stream;
+  }
+
   Future<String?> startVideoRecording() async {
     if (!controller!.value.isInitialized!) {
       showInSnackBar('Error: select a camera first.');
       return null;
     }
+    timerStream = stopWatchStream();
+    timerSubscription = timerStream!.listen((int newTick) {
+      setState(() {
+        minutesStr = ((newTick / 60) % 60).floor().toString().padLeft(2, '0');
+        secondsStr = (newTick % 60).floor().toString().padLeft(2, '0');
+      });
+    });
 
     final Directory extDir = await getApplicationDocumentsDirectory();
     final String dirPath = '${extDir.path}/Movies/flierd';
@@ -426,19 +517,25 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
       _showCameraException(e);
       return null;
     }
+
     return filePath;
   }
 
   Future<void> stopVideoRecording() async {
     if (!controller!.value.isRecordingVideo!) {
-      return null;
+      return;
     }
-
+    timerSubscription!.cancel();
+    timerStream = null;
+    setState(() {
+      minutesStr = '00';
+      secondsStr = '00';
+    });
     try {
       await controller!.stopVideoRecording();
     } on CameraException catch (e) {
       _showCameraException(e);
-      return null;
+      return;
     }
 
     await _startVideoPlayer();
@@ -446,7 +543,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 
   Future<void> pauseVideoRecording() async {
     if (!controller!.value.isRecordingVideo!) {
-      return null;
+      return;
     }
 
     try {
@@ -459,7 +556,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 
   Future<void> resumeVideoRecording() async {
     if (!controller!.value.isRecordingVideo!) {
-      return null;
+      return;
     }
 
     try {
@@ -472,9 +569,9 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
 
   Future<void> _startVideoPlayer() async {
     final VideoPlayerController vcontroller =
-    VideoPlayerController.file(File(videoPath));
+        VideoPlayerController.file(File(videoPath));
     videoPlayerListener = () {
-      if (videoController != null && videoController!.value.size != null) {
+      if (videoController != null) {
         // Refreshing the state to update video player with the correct ratio.
         if (mounted) setState(() {});
         videoController!.removeListener(videoPlayerListener);
@@ -523,9 +620,6 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   }
 }
 
-
-
-
 //Zoomer this will be a seprate widget
 class ZoomableWidget extends StatefulWidget {
   final Widget? child;
@@ -546,7 +640,7 @@ class _ZoomableWidgetState extends State<ZoomableWidget> {
   bool showZoom = false;
   Timer? t1;
 
-  bool handleZoom(newZoom){
+  bool handleZoom(newZoom) {
     if (newZoom >= 1) {
       if (newZoom > 10) {
         return false;
@@ -560,7 +654,7 @@ class _ZoomableWidgetState extends State<ZoomableWidget> {
         t1!.cancel();
       }
 
-      t1 = Timer(Duration(milliseconds: 2000), () {
+      t1 = Timer(const Duration(milliseconds: 2000), () {
         setState(() {
           showZoom = false;
         });
@@ -568,11 +662,10 @@ class _ZoomableWidgetState extends State<ZoomableWidget> {
     }
     widget.onZoom!(zoom);
     return true;
-
   }
+
   @override
   Widget build(BuildContext context) {
-
     return GestureDetector(
         onScaleStart: (scaleDetails) {
           print('scalStart');
@@ -592,17 +685,15 @@ class _ZoomableWidgetState extends State<ZoomableWidget> {
           final RenderBox box = context.findRenderObject() as RenderBox;
           final Offset localPoint = box.globalToLocal(det.globalPosition);
           final Offset scaledPoint =
-          localPoint.scale(1 / box.size.width, 1 / box.size.height);
+              localPoint.scale(1 / box.size.width, 1 / box.size.height);
           // TODO IMPLIMENT
           // widget.onTapUp(scaledPoint);
         },
         child: Stack(children: [
           Column(
             children: <Widget>[
-              Container(
-                child: Expanded(
-                  child: widget.child!,
-                ),
+              Expanded(
+                child: widget.child!,
               ),
             ],
           ),
