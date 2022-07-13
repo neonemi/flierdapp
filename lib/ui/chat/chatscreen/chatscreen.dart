@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../../../colors/colors.dart';
 import '../../../db/db.dart';
@@ -62,6 +63,15 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   final List<StreamSubscription> _subscriptions = [];
   var audio;
   CustomPopupMenuController controller = CustomPopupMenuController();
+  videothumbnail() async {
+    final uint8list = await VideoThumbnail.thumbnailData(
+      video: widget.videopath!,
+      imageFormat: ImageFormat.JPEG,
+      maxWidth:
+          128, // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
+      quality: 25,
+    );
+  }
 
   void _pickFile() async {
     final result = await FilePicker.platform
@@ -707,19 +717,56 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
               ),
             ),
             Align(
-              child: message!.isEmpty
-                  ? const Center(
-                      // child: CircularProgressIndicator(),
-                      )
-                  : Container(
-                      margin: const EdgeInsets.only(bottom: 80),
-                      child: ListView.builder(
-                          itemCount: message!.length,
+              child:Container(
+                  margin: const EdgeInsets.only(bottom: 80),
+                  alignment: Alignment.topRight,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        (widget.imagePath!).isEmpty?Container():  ListView.builder(
+                          itemCount: 1,
                           shrinkWrap: true,
                           //controller: _scrollController,
                           padding: const EdgeInsets.only(top: 10),
                           physics: const ClampingScrollPhysics(),
                           itemBuilder: (context, index) => Column(
+                              children: [
+                                Container(
+                                  height: 256,
+                                  margin: EdgeInsets.all(5),
+                                  alignment: Alignment.centerRight,
+                                  width: MediaQuery.of(context).size.width,
+                            child: Container(
+                            height: 256,
+                            width: 256,
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.grey)
+                              ),
+                            child: FadeInImage(
+                              placeholder:
+                              FileImage(File(widget.imagePath!)),
+                              image: NetworkImage('https://blog.logrocket.com/wp-content/uploads/2021/09/flutter-video-plugin-play-pause.png'),
+                              fit: BoxFit.cover,
+                              height: 256,
+                              width: 256,
+                            ),
+                        ),
+                          )
+                            ]
+                          )
+                        ),
+                        message!.isEmpty
+                            ? Center(
+                          // child: CircularProgressIndicator(),
+                        ):  Container(
+
+                          child: ListView.builder(
+                              itemCount: message!.length,
+                              shrinkWrap: true,
+                              //controller: _scrollController,
+                              padding: const EdgeInsets.only(top: 10),
+                              physics: const ClampingScrollPhysics(),
+                              itemBuilder: (context, index) => Column(
                                 children: [
                                   Container(
                                     padding: const EdgeInsets.only(
@@ -739,7 +786,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                         decoration: Styles.boxme,
                                         child: Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                                 "${msgtime![index].hour.toString().padLeft(2, '')}:${msgtime![index].minute.toString().padLeft(2, '')}",
@@ -761,7 +808,6 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                       ),
                                     ),
                                   ),
-
                                   // Container(
                                   //
                                   //   padding: const EdgeInsets.only(left: 14,right: 14,top: 10,bottom: 10),
@@ -778,7 +824,14 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                   // ),
                                 ],
                               )),
+                        ),
+                      ],
                     ),
+                  )
+              )
+
+
+
             ),
           ]),
         ));
@@ -792,13 +845,6 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
     notifyListeners(); // To rebuild the Widget
   }
 }
-// FadeInImage(
-// placeholder: const FileImage(pathToFile),
-// image: NetworkImage(uploadedFileUrl),
-// fit: BoxFit.cover,
-// width: double.infinity,
-// height: 256,
-// ),
 
 // Align(
 //         child: ListView.builder(

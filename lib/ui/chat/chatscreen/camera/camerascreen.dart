@@ -127,6 +127,16 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
         children: <Widget>[
           Expanded(
             child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black,
+                border: Border.all(
+                  color:
+                      controller != null && controller!.value.isRecordingVideo!
+                          ? Colors.redAccent
+                          : Colors.grey,
+                  width: 3.0,
+                ),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(1.0),
                 child: Center(
@@ -141,16 +151,6 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
                             controller!.zoom(zoom);
                           }
                         })),
-              ),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                border: Border.all(
-                  color:
-                      controller != null && controller!.value.isRecordingVideo!
-                          ? Colors.redAccent
-                          : Colors.grey,
-                  width: 3.0,
-                ),
               ),
             ),
           ),
@@ -620,7 +620,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
   }
 }
 
-//Zoomer this will be a seprate widget
+//ZoomableWidget this will be a separate widget
 class ZoomableWidget extends StatefulWidget {
   final Widget? child;
   final Function? onZoom;
