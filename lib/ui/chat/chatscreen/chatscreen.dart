@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -44,8 +43,6 @@ class ChatScreen extends StatefulWidget {
 
 class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   final TextEditingController _messageController = TextEditingController();
-  // VideoPlayerController? _cameraVideoPlayerController;
-  // VideoPlayerController? _videoPlayerController;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isLoading = true;
   List<Map<String, dynamic>> _chatlist = [];
@@ -53,12 +50,9 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   File? _video;
   final ImagePicker _picker = ImagePicker();
   FilePickerResult? result1;
-
   var filepath;
-
   FilePickerResult? result;
   var filename;
-
   String fileType = 'All';
   var fileTypeList = ['All', 'Image', 'Video', 'Audio', 'MultipleFile'];
   var fileTypegallery = ['Image', 'Video'];
@@ -72,10 +66,9 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   void _pickFile() async {
     final result = await FilePicker.platform
         .pickFiles(allowMultiple: true, type: FileType.any);
-
     setState(() {
       if (result != null) {
-        result1 = result as FilePickerResult?;
+        result1 = result;
         result.files.first.name;
         filepath = result.files.first.path;
       }
@@ -96,7 +89,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
 
     setState(() {
       if (result != null) {
-        resultaudio = result as FilePickerResult?;
+        resultaudio = result;
         result.files.first.name;
         audiopath = result.files.first.path;
       }
@@ -187,7 +180,6 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   @override
   void initState() {
     super.initState();
-
     BackButtonInterceptor.add(myInterceptor);
     _refreshchatlist();
   }
@@ -215,21 +207,21 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   Widget _buildLongPressMenu(BuildContext context) {
     return Container(
       height: 65,
-      margin: EdgeInsets.fromLTRB(12, 0, 20, 0),
-      padding: EdgeInsets.only(left: 10, right: 4, top: 5, bottom: 10),
+      margin: const EdgeInsets.fromLTRB(12, 0, 20, 0),
+      padding: const EdgeInsets.only(left: 10, right: 4, top: 5, bottom: 10),
       alignment: Alignment.center,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20),
               bottomRight: Radius.circular(20),
               topRight: Radius.circular(20))),
       child: GridView(
-        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 15),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 5, mainAxisSpacing: 5, crossAxisSpacing: 5),
         shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         children: [
           Column(
             children: [
@@ -244,21 +236,17 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        child: Image.asset(
-                          "assets/images/plusicon.png",
-                          color: Colors.white,
-                          height: 20,
-                          width: 15,
-                        ),
+                      Image.asset(
+                        "assets/images/plusicon.png",
+                        color: Colors.white,
+                        height: 20,
+                        width: 15,
                       ),
-                      Container(
-                        child: Image.asset(
-                          "assets/images/twodots.png",
-                          color: Colors.white,
-                          height: 20,
-                          width: 15,
-                        ),
+                      Image.asset(
+                        "assets/images/twodots.png",
+                        color: Colors.white,
+                        height: 20,
+                        width: 15,
                       )
                     ],
                   ),
@@ -277,10 +265,10 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                 cameras: widget.cameras,
                               )));
                 },
-                child: Container(
+                child: const SizedBox(
                   height: 30,
                   width: 40,
-                  child: const Icon(
+                  child: Icon(
                     Icons.camera_alt,
                     size: 30,
                     color: ColorConstant.gradient2,
@@ -300,8 +288,8 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                   decoration: BoxDecoration(
                       color: ColorConstant.gradient2,
                       borderRadius: BorderRadius.circular(5)),
-                  child: Center(
-                    child: const Icon(
+                  child: const Center(
+                    child: Icon(
                       Icons.gif,
                       size: 28,
                       color: Colors.white,
@@ -315,10 +303,10 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
             children: [
               GestureDetector(
                 onTap: _pickaudio,
-                child: Container(
+                child: const SizedBox(
                   height: 30,
                   width: 30,
-                  child: const Icon(
+                  child: Icon(
                     Icons.mic,
                     size: 30,
                     color: ColorConstant.gradient2,
@@ -331,10 +319,10 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
             children: [
               GestureDetector(
                 onTap: _pickFile,
-                child: Container(
+                child: const SizedBox(
                   height: 30,
                   width: 30,
-                  child: const Icon(
+                  child: Icon(
                     Icons.attachment,
                     size: 30,
                     color: ColorConstant.gradient2,
@@ -348,7 +336,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
     );
   }
 
-  ScrollController _scrollController = new ScrollController();
+  final ScrollController _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     log(_chatlist.toString());
@@ -435,7 +423,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
               alignment: Alignment.bottomLeft,
               child: Container(
                 padding: const EdgeInsets.only(left: 22, bottom: 10, top: 10),
-                margin: EdgeInsets.only(top: 100),
+                margin: const EdgeInsets.only(top: 100),
                 height: 80,
 
                 // width: double.infinity,
@@ -468,7 +456,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                           replacement: Container(
                             height: 60,
                             width: 60,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.only(
                                     bottomRight: Radius.circular(20),
@@ -479,7 +467,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                 width: 30,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  gradient: LinearGradient(
+                                  gradient: const LinearGradient(
                                     begin: Alignment(-0.95, 0.0),
                                     end: Alignment(1.0, 0.0),
                                     colors: [
@@ -493,21 +481,17 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Container(
-                                        child: Image.asset(
-                                          "assets/images/plusicon.png",
-                                          color: Colors.white,
-                                          height: 20,
-                                          width: 10,
-                                        ),
+                                      Image.asset(
+                                        "assets/images/plusicon.png",
+                                        color: Colors.white,
+                                        height: 20,
+                                        width: 10,
                                       ),
-                                      Container(
-                                        child: Image.asset(
-                                          "assets/images/twodots.png",
-                                          color: Colors.white,
-                                          height: 10,
-                                          width: 10,
-                                        ),
+                                      Image.asset(
+                                        "assets/images/twodots.png",
+                                        color: Colors.white,
+                                        height: 10,
+                                        width: 10,
                                       )
                                     ],
                                   ),
@@ -518,7 +502,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                           child: Container(
                             height: 60,
                             width: 60,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                                 color: Colors.white,
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(20))),
@@ -528,7 +512,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                 width: 30,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  gradient: LinearGradient(
+                                  gradient: const LinearGradient(
                                     begin: Alignment(-0.95, 0.0),
                                     end: Alignment(1.0, 0.0),
                                     colors: [
@@ -542,21 +526,17 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Container(
-                                        child: Image.asset(
-                                          "assets/images/plusicon.png",
-                                          color: Colors.white,
-                                          height: 20,
-                                          width: 10,
-                                        ),
+                                      Image.asset(
+                                        "assets/images/plusicon.png",
+                                        color: Colors.white,
+                                        height: 20,
+                                        width: 10,
                                       ),
-                                      Container(
-                                        child: Image.asset(
-                                          "assets/images/twodots.png",
-                                          color: Colors.white,
-                                          height: 10,
-                                          width: 10,
-                                        ),
+                                      Image.asset(
+                                        "assets/images/twodots.png",
+                                        color: Colors.white,
+                                        height: 10,
+                                        width: 10,
                                       )
                                     ],
                                   ),
@@ -581,7 +561,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                           margin: const EdgeInsets.only(top: 10),
                           width: double.infinity,
                           alignment: Alignment.center,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(20),
@@ -592,11 +572,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                             keyboardType: TextInputType.multiline,
                             textInputAction: TextInputAction.done,
                             maxLines: null,
-
-                            // onChanged: (value){
-                            //   _messageController.text=value;
-                            // },
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               contentPadding: EdgeInsets.all(10),
                               hintText: "Write message...",
                               hintStyle: TextStyle(color: Colors.black54),
@@ -613,7 +589,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                           //  margin: const EdgeInsets.only( top: 10),
                           width: double.infinity,
                           alignment: Alignment.center,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(20),
@@ -624,11 +600,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                             keyboardType: TextInputType.multiline,
                             textInputAction: TextInputAction.done,
                             maxLines: null,
-
-                            // onChanged: (value){
-                            //   _messageController.text=value;
-                            // },
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               contentPadding: EdgeInsets.all(10),
                               hintText: "Write message...",
                               hintStyle: TextStyle(color: Colors.black54),
@@ -659,15 +631,15 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                     Visibility(
                       visible: visiblity,
                       replacement: Container(
-                        margin: EdgeInsets.only(right: 10, top: 10),
+                        margin: const EdgeInsets.only(right: 10, top: 10),
                         //  color: Colors.white,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
                                 topRight: Radius.circular(20),
                                 bottomRight: Radius.circular(20))),
                         child: Container(
-                          padding: EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           child: FloatingActionButton(
                               onPressed: () async {
                                 setState(() {
@@ -685,7 +657,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                               backgroundColor: Colors.grey.shade100,
                               elevation: 0,
                               child: Container(
-                                  padding: EdgeInsets.all(2),
+                                  padding: const EdgeInsets.all(2),
                                   height: 50,
                                   width: 30,
                                   child: Image.asset(
@@ -697,33 +669,28 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                         ),
                       ),
                       child: Container(
-                        margin: EdgeInsets.only(right: 10),
+                        margin: const EdgeInsets.only(right: 10),
                         //  color: Colors.white,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
                                 topRight: Radius.circular(20),
                                 bottomRight: Radius.circular(20))),
                         child: Container(
-                          padding: EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           child: FloatingActionButton(
                               onPressed: () async {
                                 setState(() {
                                   message!.add(_messageController.text);
                                   msgtime!.add(DateTime.now());
                                 });
-                                // _scrollController.animateTo(
-                                //   0.0,
-                                //   curve: Curves.easeOut,
-                                //   duration: const Duration(milliseconds: 300),
-                                // );
                                 // updateData(message!);
                                 // await _addItem();
                               },
                               backgroundColor: Colors.grey.shade100,
                               elevation: 0,
                               child: Container(
-                                  padding: EdgeInsets.all(2),
+                                  padding: const EdgeInsets.all(2),
                                   height: 50,
                                   width: 30,
                                   child: Image.asset(
@@ -745,13 +712,13 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                       // child: CircularProgressIndicator(),
                       )
                   : Container(
-                      margin: EdgeInsets.only(bottom: 80),
+                      margin: const EdgeInsets.only(bottom: 80),
                       child: ListView.builder(
                           itemCount: message!.length,
                           shrinkWrap: true,
                           //controller: _scrollController,
                           padding: const EdgeInsets.only(top: 10),
-                          physics: ClampingScrollPhysics(),
+                          physics: const ClampingScrollPhysics(),
                           itemBuilder: (context, index) => Column(
                                 children: [
                                   Container(
@@ -768,7 +735,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                             right: 14,
                                             top: 14,
                                             bottom: 14),
-                                        margin: EdgeInsets.only(left: 44),
+                                        margin: const EdgeInsets.only(left: 44),
                                         decoration: Styles.boxme,
                                         child: Column(
                                           crossAxisAlignment:
@@ -776,10 +743,10 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                           children: [
                                             Text(
                                                 "${msgtime![index].hour.toString().padLeft(2, '')}:${msgtime![index].minute.toString().padLeft(2, '')}",
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                     fontSize: 12,
                                                     color: Colors.grey)),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 5,
                                             ),
                                             Text(
