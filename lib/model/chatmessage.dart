@@ -1,5 +1,16 @@
+import 'dart:typed_data';
+
+import 'package:video_player/video_player.dart';
+
 class ChatMessage{
-  String messageContent;
+  String messagetext;
   String messageType;
-  ChatMessage({required this.messageContent, required this.messageType});
+  String imagepath;
+  String videopath;
+  DateTime messagetime;
+  Uint8List? uint8list;
+  VideoPlayerController? videoController;
+  String audio;
+  ChatMessage({required this.messagetext, required this.messageType,required this.imagepath,
+    required this.videopath,required this.messagetime,required this.uint8list,required this.videoController,required this.audio});
 }

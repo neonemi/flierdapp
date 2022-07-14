@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../colors/colors.dart';
-import '../../main.dart';
+import '../../../colors/colors.dart';
+import '../../../main.dart';
 import 'chatpagepresenter.dart';
 import 'chatpageview.dart';
-import 'chatscreen/chatscreen.dart';
+import '../chatscreen/mainscreen/chatscreen.dart';
 
 
 class ChatPage extends StatefulWidget {
@@ -202,7 +202,8 @@ class ChatPageState extends State<ChatPage>
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => ChatScreen(
-                                              cameras: widget.cameras,
+                                              cameras: widget.cameras, image: chatusers1[index][
+                                        'profile_pic_url'].toString(), name: chatusers1[index]['name'].toString(),
                                             )));
                               },
                               child: Container(

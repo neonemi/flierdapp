@@ -46,6 +46,7 @@ dependencies:
   path_provider:
   just_audio:
   video_thumbnail: ^0.5.0
+  audioplayers:
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -11,4 +11,6 @@ static const gradient1= Color(0xFFdc74b9);
 static const gradient2= Color(0xFF5c38ff);
 static const bg1=Color(0xFFdc74b9);
 static const bg2=Color(0xFF3f395c);
+static const palemageta=Color(0xFFEFADF9);
+static const dusk=Color(0xFFECC1B2);
 }

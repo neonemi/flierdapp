@@ -1,6 +1,6 @@
 
 import 'package:flierdapp/colors/colors.dart';
-import 'package:flierdapp/ui/chat/chatpage.dart';
+import 'package:flierdapp/ui/chat/chatpage/chatpage.dart';
 
 import 'package:flierdapp/utils/string.dart';
 import 'package:flutter/material.dart';

@@ -14,17 +14,17 @@ import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
-
-import '../chatscreen.dart';
-
-
+import '../mainscreen/chatscreen.dart';
 
 class CameraSend extends StatefulWidget {
   String? imagePath;
   String? videopath;
   VideoPlayerController? videoController;
  final cameras;
-  CameraSend({Key? key,required this.cameras,required this.imagePath,required this.videoController,required this.videopath}) : super(key: key);
+  String name="";
+  String image="";
+  CameraSend({Key? key,required this.cameras,required this.imagePath,required this.videoController,
+    required this.videopath,required this.name,required this.image}) : super(key: key);
   @override
   _CameraSendState createState() {
     return _CameraSendState();
@@ -42,7 +42,7 @@ class _CameraSendState extends State<CameraSend> {
   @override
   void dispose() {
     BackButtonInterceptor.remove(myInterceptor);
-    widget.videoController?.dispose();
+     widget.videoController?.dispose();
     super.dispose();
   }
 
@@ -50,7 +50,7 @@ class _CameraSendState extends State<CameraSend> {
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras,)));
+        context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras, image: widget.image,name: widget.name,)));
     // Do some stuff.
     return true;
   }
@@ -123,7 +123,8 @@ class _CameraSendState extends State<CameraSend> {
                 onTap: (){
                   log('tap');
                   Navigator.pushReplacement(
-                      context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras, imagePath: widget.imagePath, videoController: widget.videoController,videopath: widget.videopath,)));
+                      context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras, imagePath: widget.imagePath, videoController: widget.videoController,
+                    videopath: widget.videopath, name: widget.name,image: widget.image,)));
 
                 },
                 child: Container(
