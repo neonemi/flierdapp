@@ -47,6 +47,8 @@ dependencies:
   just_audio:
   video_thumbnail: ^0.5.0
   audioplayers:
+  open_file: ^3.2.1
+  url_launcher:
 dev_dependencies:
   flutter_test:
     sdk: flutter

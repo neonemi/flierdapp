@@ -27,13 +27,14 @@ class BubbleNormalAudio extends StatelessWidget {
   final double? position;
   final bool isLoading;
   final double bubbleRadius;
-  final bool isSender;
+  final bool? isSender;
   final Color color;
   final bool tail;
   final bool sent;
   final bool delivered;
   final bool seen;
   final TextStyle textStyle;
+  final DateTime? time;
 
 
   BubbleNormalAudio({
@@ -46,7 +47,7 @@ class BubbleNormalAudio extends StatelessWidget {
     this.position,
     this.isLoading = true,
     this.bubbleRadius = BUBBLE_RADIUS_AUDIO,
-    this.isSender = true,
+    this.isSender,
     this.color = Colors.white70,
     this.tail = true,
     this.sent = false,
@@ -56,7 +57,7 @@ class BubbleNormalAudio extends StatelessWidget {
       color: Colors.black87,
       fontSize: 12,
     ),
-
+    this.time
   }) : super(key: key);
 
   ///chat bubble builder method
@@ -91,7 +92,7 @@ class BubbleNormalAudio extends StatelessWidget {
 
     return Row(
       children: <Widget>[
-        isSender
+        isSender==true
             ? Expanded(
           child: SizedBox(
             width: 5,
@@ -111,12 +112,12 @@ class BubbleNormalAudio extends StatelessWidget {
                   topLeft: Radius.circular(bubbleRadius),
                   topRight: Radius.circular(bubbleRadius),
                   bottomLeft: Radius.circular(tail
-                      ? isSender
+                      ? isSender==true
                       ? bubbleRadius
                       : 0
                       : BUBBLE_RADIUS_AUDIO),
                   bottomRight: Radius.circular(tail
-                      ? isSender
+                      ? isSender==true
                       ? 0
                       : bubbleRadius
                       : BUBBLE_RADIUS_AUDIO),
@@ -124,7 +125,13 @@ class BubbleNormalAudio extends StatelessWidget {
               ),
               child: Stack(
                 children: [
-
+                  Container(
+                    padding:EdgeInsets.only(left: 10,top: 10,bottom: 10),
+                    child: Text("${time!.hour.toString().padLeft(2, '')}:${time!.minute.toString().padLeft(2, '')}", style: textStyle,),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
                   Container(
                     margin: EdgeInsets.only(top: 10),
                     child: Row(
@@ -158,6 +165,9 @@ class BubbleNormalAudio extends StatelessWidget {
                             max: duration ?? 0.0,
                             value: position ?? 0.0,
                             onChanged: onSeekChanged,
+                            activeColor: Colors.white,
+                            thumbColor: Colors.white,
+                            inactiveColor: Colors.white,
                           ),
                         ),
                       ],

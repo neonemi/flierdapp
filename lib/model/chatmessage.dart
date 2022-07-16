@@ -11,6 +11,9 @@ class ChatMessage{
   Uint8List? uint8list;
   VideoPlayerController? videoController;
   String audio;
+  String filepath;
+  String filename;
   ChatMessage({required this.messagetext, required this.messageType,required this.imagepath,
-    required this.videopath,required this.messagetime,required this.uint8list,required this.videoController,required this.audio});
+    required this.videopath,required this.messagetime,required this.uint8list,required this.videoController,
+    required this.audio,required this.filepath,required this.filename});
 }

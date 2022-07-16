@@ -14,6 +14,7 @@ import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
+import '../../../../model/chatmessage.dart';
 import '../mainscreen/chatscreen.dart';
 
 class CameraSend extends StatefulWidget {
@@ -23,8 +24,9 @@ class CameraSend extends StatefulWidget {
  final cameras;
   String name="";
   String image="";
+  List<ChatMessage>? chatmessage;
   CameraSend({Key? key,required this.cameras,required this.imagePath,required this.videoController,
-    required this.videopath,required this.name,required this.image}) : super(key: key);
+    required this.videopath,required this.name,required this.image,required this.chatmessage}) : super(key: key);
   @override
   _CameraSendState createState() {
     return _CameraSendState();
@@ -50,7 +52,7 @@ class _CameraSendState extends State<CameraSend> {
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras, image: widget.image,name: widget.name,)));
+        context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras, image: widget.image,name: widget.name,chatmessage: widget.chatmessage,)));
     // Do some stuff.
     return true;
   }
@@ -124,7 +126,7 @@ class _CameraSendState extends State<CameraSend> {
                   log('tap');
                   Navigator.pushReplacement(
                       context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras, imagePath: widget.imagePath, videoController: widget.videoController,
-                    videopath: widget.videopath, name: widget.name,image: widget.image,)));
+                    videopath: widget.videopath, name: widget.name,image: widget.image,chatmessage: widget.chatmessage,)));
 
                 },
                 child: Container(

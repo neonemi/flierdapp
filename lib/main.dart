@@ -1,6 +1,7 @@
 
 import 'package:flierdapp/colors/colors.dart';
 import 'package:flierdapp/ui/chat/chatpage/chatpage.dart';
+import 'package:flierdapp/ui/chat/chatscreen/mainscreen/chatscreen.dart';
 
 import 'package:flierdapp/utils/string.dart';
 import 'package:flutter/material.dart';
@@ -85,10 +86,10 @@ class MyApp extends StatelessWidget {
                       //////// HERE
                     ),
                     onPressed: () {
-                      // Navigator.pushReplacement(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) => QuizPage()));
+                      Navigator.pushReplacement(context, MaterialPageRoute(
+                          builder: (context) => ChatScreen(
+                            cameras:cameras, image: 'https://i.picsum.photos/id/722/200/300.jpg?hmac=MDrZtULoytyxS357HVHCqzJRUv_BsxU0MEgszPVuMyY', name:'name',
+                          )));
                     },
                     child: const Text(
                       continueSwiping,

@@ -13,6 +13,7 @@ import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
+import '../../../../model/chatmessage.dart';
 import '../mainscreen/chatscreen.dart';
 import 'mediasend.dart';
 
@@ -20,13 +21,14 @@ class CameraApp extends StatelessWidget {
   final List<CameraDescription> cameras;
   String? name;
   String? image;
-   CameraApp({Key? key, required this.cameras,required this.image,required this.name}) : super(key: key);
+  List<ChatMessage>? chatmessage;
+   CameraApp({Key? key, required this.cameras,required this.image,required this.name,required this.chatmessage}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     return CameraExampleHome(
-      cameras: cameras, name:name!, image: image!,
+      cameras: cameras, name:name!, image: image!,chatmessage: chatmessage,
     );
   }
 }
@@ -54,7 +56,8 @@ class CameraExampleHome extends StatefulWidget {
   var cameras;
   String name="";
   String image="";
-  CameraExampleHome({Key? key, required this.cameras,required this.name,required this.image}) : super(key: key);
+  List<ChatMessage>? chatmessage;
+  CameraExampleHome({Key? key, required this.cameras,required this.name,required this.image,required this.chatmessage}) : super(key: key);
   @override
   _CameraExampleHomeState createState() {
     return _CameraExampleHomeState();
@@ -96,7 +99,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
         context,
         MaterialPageRoute(
             builder: (context) => ChatScreen(
-                  cameras: widget.cameras, name: widget.name,image: widget.image,
+                  cameras: widget.cameras, name: widget.name,image: widget.image,chatmessage: widget.chatmessage,
                 )));
     // Do some stuff.
     return true;
@@ -354,7 +357,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
     }
     controller = CameraController(
       cameraDescription!,
-      ResolutionPreset.medium,
+      ResolutionPreset.ultraHigh,
       enableAudio: enableAudio,
     );
 
@@ -393,7 +396,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
                         cameras: widget.cameras,
                         imagePath: filePath,
                         videoController: null,
-                        videopath: null, image: widget.image,name: widget.name,
+                        videopath: null, image: widget.image,name: widget.name, chatmessage: widget.chatmessage,
                       )));
 
           // showInSnackBar('Picture saved to $filePath');
@@ -425,7 +428,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
                       cameras: widget.cameras,
                       imagePath: null,
                       videoController: videoController,
-                      videopath: videoPath, image: widget.image,name: widget.name,
+                      videopath: videoPath, image: widget.image,name: widget.name,chatmessage: widget.chatmessage,
                     )));
 
         //  showInSnackBar('Video recorded to: $videoPath');

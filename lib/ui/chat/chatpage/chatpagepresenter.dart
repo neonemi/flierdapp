@@ -25,7 +25,9 @@ class ChatPagePresenter {
             jsonDecode(response.body)['data']['chat_with_users'].toString();
         print(venam.toString());
         print(venamid.toString());
-      } else {}
+      } else {
+        print(response.statusCode);
+      }
     } else {
       print(response.statusCode);
     }

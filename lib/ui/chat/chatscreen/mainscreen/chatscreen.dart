@@ -10,7 +10,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
@@ -23,6 +25,7 @@ import '../../chatpage/chatpage.dart';
 import '../camera/audioplayer.dart';
 import '../camera/camerascreen.dart';
 import '../camera/videoplayer.dart';
+import '../imageview/imageview.dart';
 
 class ChatScreen extends StatefulWidget {
   final cameras;
@@ -31,6 +34,7 @@ class ChatScreen extends StatefulWidget {
   VideoPlayerController? videoController;
   String name = "";
   String image = "";
+  List<ChatMessage>? chatmessage;
   ChatScreen(
       {Key? key,
       this.cameras,
@@ -38,7 +42,7 @@ class ChatScreen extends StatefulWidget {
       this.videoController,
       this.imagePath,
       required this.name,
-      required this.image})
+      required this.image,this.chatmessage})
       : super(key: key);
 
   @override
@@ -72,6 +76,8 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   bool isPlaying = false;
   bool isLoading = false;
   bool isPause = false;
+  bool _isPlaying = false;
+  AudioPlayer? audioPlayer;
 
   Future<void> _videothumbnail() async {
     load_path_video();
@@ -92,9 +98,50 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
           messagetime: DateTime.now(),
           uint8list: uint8list,
           videoController: widget.videoController,
-          audio: ''));
+          audio: '', filepath: '', filename: ''));
     });
   }
+var response;
+  void playAudioFromLocalStorage(path) async {
+     response =  audioPlayer!.play(path) ;
+
+//     AudioSource.uri(Uri.file(path));
+    if (response == 1) {
+      // success
+
+    } else {
+      print('Some error occured in playing from storage!');
+    }
+  }
+  pauseAudio() async {
+     response =  audioPlayer!.pause() ;
+     // audioPlayer.state.index;
+    if (response == 1) {
+      // success
+
+    } else {
+      print('Some error occured in pausing');
+    }
+  }
+  stopAudio() async {
+     response =  audioPlayer!.stop();
+    if (response == 1) {
+      // success
+
+    } else {
+      print('Some error occured in stopping');
+    }
+  }
+  resumeAudio() async {
+     response =  audioPlayer!.resume();
+    if (response == 1) {
+      // success
+
+    } else {
+      print('Some error occured in resuming');
+    }
+  }
+
 
   void _pickFile() async {
     final result = await FilePicker.platform
@@ -106,6 +153,15 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
         filepath = result.files.first.path;
       }
     });
+    messages!.add(ChatMessage(
+        messagetext: '',
+        messageType: 'sender',
+        imagepath: '',
+        videopath: '',
+        messagetime: DateTime.now(),
+        uint8list: null,
+        videoController: null,
+        audio: '', filepath: filepath, filename: result!.files.first.name));
     if (result == null) return;
     filename = result.files.first.name;
     log(result.files.first.name);
@@ -135,7 +191,8 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
         messagetime: DateTime.now(),
         uint8list: null,
         videoController: null,
-        audio: audiopath!));
+        audio: audiopath!, filepath: '', filename: ''));
+
     if (result == null) return;
     audioname = result.files.first.name;
     log(result.files.first.name);
@@ -203,6 +260,16 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   void initState() {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
+    if(widget.chatmessage != null){
+      if(widget.chatmessage!.isNotEmpty){
+        Iterable<ChatMessage> list=List.from(widget.chatmessage!);
+        setState((){
+          messages!.addAll(list);
+        });
+
+      }
+    }
+    audioPlayer = AudioPlayer();
     _refreshchatlist();
     if (widget.imagePath != null) {
       setState(() {
@@ -214,7 +281,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
             messagetime: DateTime.now(),
             uint8list: null,
             videoController: null,
-            audio: ''));
+            audio: '', filepath: '', filename: ''));
       });
     } else if (widget.videopath != null) {
       _videothumbnail();
@@ -258,7 +325,14 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
       // if I print ($dirPath) I have /data/user/0/com.XXXXX.flutter_video_test/app_flutter/Movies/2019-11-08.mp4
     });
   }
-
+  var _openResult;
+ void urllauch(String path) async {
+   final message = await OpenFile.open(path);
+   setState(() {
+     _openResult = message;
+   });
+    return;
+  }
   DateTime time = DateTime.now();
   List<DateTime>? msgtime = [].cast<DateTime>().toList(growable: true);
   AudioPlayer player = AudioPlayer();  //add this
@@ -266,6 +340,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
 void playaudio(){
   cache.load(audiopath!);
 }
+
   Widget _buildLongPressMenu(BuildContext context) {
     return Stack(
 
@@ -329,7 +404,7 @@ void playaudio(){
                               builder: (context) => CameraApp(
                                     cameras: widget.cameras,
                                     name: widget.name,
-                                    image: widget.image,
+                                    image: widget.image, chatmessage: messages,
                                   )));
                     },
                     child: const SizedBox(
@@ -390,7 +465,7 @@ void playaudio(){
                       height: 30,
                       width: 30,
                       child: Icon(
-                        Icons.attachment,
+                        Icons.attach_file_sharp,
                         size: 30,
                         color: ColorConstant.gradient2,
                       ),
@@ -412,12 +487,20 @@ void playaudio(){
     );
   }
 
+  void updateData(List<ChatMessage> list) {
+    setState(() {
+      messages!.clear();
+      messages!.addAll(list);
+    });
+
+    notifyListeners(); // To rebuild the Widget
+  }
   final ScrollController _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     log(_chatlist.toString());
     log(message.toString());
-    // log(messages!=null?messages![0].imagepath.toString():"");
+     // log(messages!=null?messages![1].imagepath.toString():'');
     // log(messages!=null?messages![1].messagetext.toString():"");
     log(msgtime.toString());
     log(widget.videopath.toString());
@@ -429,10 +512,11 @@ void playaudio(){
       body: Scaffold(
         backgroundColor: Colors.white,
         key: _scaffoldKey,
+        extendBody: false,
         // resizeToAvoidBottomInset: false,
-        body: Listener(
-          behavior: HitTestBehavior.opaque,
-          onPointerDown: (_) {
+        body: GestureDetector(
+
+          onTap: () {
             setState((){
               visiblity=true;
             });
@@ -512,7 +596,7 @@ void playaudio(){
                               ),
                               onTap: () {
                                 setState(() {
-                                  message!.clear();
+                                  messages!.clear();
                                 });
                               },
                             );
@@ -545,11 +629,14 @@ void playaudio(){
                               itemBuilder: (context, index) =>
                                   Column(
                                     children: [
+                                      if (messages![index]
+                                          .messagetext
+                                          .isNotEmpty)
                                       Container(
                                         padding: const EdgeInsets.only(
                                             left: 14,
                                             right: 14,
-                                            top: 14,
+
                                             bottom: 14),
                                         child: Align(
                                           alignment:
@@ -580,9 +667,6 @@ void playaudio(){
                                                 const SizedBox(
                                                   height: 5,
                                                 ),
-                                                if (messages![index]
-                                                    .messagetext
-                                                    .isNotEmpty)
                                                   Text(
                                                     (messages![index]
                                                         .messagetext),
@@ -591,70 +675,109 @@ void playaudio(){
                                                         color: Colors.white),
                                                     textAlign: TextAlign.left,
                                                   ),
-                                                if (messages![index]
-                                                    .imagepath
-                                                    .isNotEmpty)
-                                                  Column(children: [
-                                                    Container(
-                                                      margin:
-                                                          const EdgeInsets.all(5),
-                                                      alignment: messages![index]
-                                                                  .messageType ==
-                                                              'sender'
-                                                          ? Alignment.topRight
-                                                          : Alignment.topLeft,
-                                                      width:
-                                                          MediaQuery.of(context)
-                                                              .size
-                                                              .width,
-                                                      child: AspectRatio(
-                                                        aspectRatio: 16 / 9,
-                                                        child: FadeInImage(
-                                                          placeholder: FileImage(
-                                                              File(messages![
-                                                                      index]
-                                                                  .imagepath)),
-                                                          image: const NetworkImage(
-                                                              'https://blog.logrocket.com/wp-content/uploads/2021/09/flutter-video-plugin-play-pause.png'),
-                                                          fit: BoxFit.fill,
-                                                        ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      if (messages![index]
+                                          .uint8list!=null)
+                                        GestureDetector(
+                                          onTap: (){
+                                            AlertDialog alert = AlertDialog(
+                                              contentPadding: EdgeInsets.all(4),
+                                              content: Imageview(filepath: messages![index]
+                                                  .uint8list, type: 2, videopath: messages![index].videopath,),
+                                            );
+                                           showDialog(context: context, builder: (BuildContext context){
+                                             return alert;
+                                           },);
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.only(
+                                                left: 14,
+                                                right: 14,
+
+                                                bottom: 14),
+                                            child: Align(
+                                              alignment:
+                                              messages![index].messageType ==
+                                                  'sender'
+                                                  ? Alignment.topRight
+                                                  : Alignment.topLeft,
+                                              child: Container(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 10,
+                                                    bottom: 10),
+
+                                                margin: messages![index].messageType == 'sender' ?EdgeInsets.only(left: 44):EdgeInsets.only(right: 44),
+                                                child: Container(
+                                                  height: 150,
+                                                  width: 150,
+                                                  decoration:
+                                                  messages![index].messageType ==
+                                                      'sender'
+                                                      ? Styles.imageboxme
+                                                      : Styles.imageboxsomebody,
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Container(
+                                                        padding: const EdgeInsets.only(
+                                                            left: 10,
+                                                            right: 10,
+                                                            top: 10,
+                                                            bottom: 10),
+                                                        child: Text(
+                                                            "${messages![index].messagetime.hour.toString().padLeft(2, '')}:${messages![index].messagetime.minute.toString().padLeft(2, '')}",
+                                                            style: const TextStyle(
+                                                                fontSize: 12,
+                                                                color: Colors.grey)),
                                                       ),
-                                                    )
-                                                  ]),
-                                                if (messages![index]
-                                                    .videopath
-                                                    .isNotEmpty)
-                                                  Column(children: [
-                                                    loading
-                                                        ? CircularProgressIndicator()
-                                                        : Container(
+                                                      const SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Column(children: [
+                                                        Container(
                                                             margin:
-                                                                const EdgeInsets
-                                                                    .all(5),
-                                                            alignment: messages![
-                                                                            index]
-                                                                        .messageType ==
-                                                                    'sender'
-                                                                ? Alignment
-                                                                    .topRight
-                                                                : Alignment
-                                                                    .topLeft,
-                                                            width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width,
-                                                            child:
-                                                                NetworkPlayerLifeCycle(
-                                                                    '$dirPath', // with the String dirPath I have error but if I use the same path but write like this  /data/user/0/com.XXXXX.flutter_video_test/app_flutter/Movies/2019-11-08.mp4 it's ok ... why ?
-                                                                    (BuildContext
-                                                                                context,
-                                                                            VideoPlayerController
-                                                                                controller) =>
-                                                                        AspectRatioVideo(
-                                                                           controller: controller)),
-                                                          ),
-                                                  ]),
-                                                if (messages![index].audio.isNotEmpty)
+                                                            const EdgeInsets.all(5),
+                                                            alignment: Alignment.topRight,
+                                                            child: Container(
+                                                              height: 100,
+                                                              width: 150,
+                                                          child: Image.memory(messages![index]
+                                                              .uint8list!,fit: BoxFit.fill,),)
+                                                        ),
+                                                      ]),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                      ),
+                                        ),
+                                      if (messages![index].audio.isNotEmpty)
+                                      Container(
+                                        padding: const EdgeInsets.only(
+                                            left: 14,
+                                            right: 14,
+                                            top: 14,
+                                            bottom: 14),
+                                        child: Align(
+                                          alignment:
+                                          messages![index].messageType ==
+                                              'sender'
+                                              ? Alignment.topRight
+                                              : Alignment.topLeft,
+                                          child: Container(
+
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+
                                                   Container(
                                                     width: MediaQuery.of(context).size.width,
                                                     alignment: messages![
@@ -663,10 +786,14 @@ void playaudio(){
                                                       mainAxisAlignment: MainAxisAlignment.start,
                                                       children: [
                                                         BubbleNormalAudio(
+                                                          isSender: messages![
+                                                          index].messageType == 'sender' ?true: false,
+                                                          time: messages![index].messagetime,
                                                           textStyle: TextStyle(
                                                               fontSize: 12,
                                                               color: Colors.grey),
-                                                          color: Colors.grey.shade50,
+                                                          color: messages![
+                                                          index].messageType == 'sender' ?ColorConstant.deepblue:  ColorConstant.chatrece,
                                                           duration: duration.inSeconds
                                                               .toDouble(),
                                                           position: position.inSeconds
@@ -676,6 +803,7 @@ void playaudio(){
                                                           isPause: isPause,
                                                           onSeekChanged: (value) {},
                                                           onPlayPauseButtonClick: () {
+                                                            playAudioFromLocalStorage(audiopath);
                                                             //playaudio();
                                                           },
                                                           sent: false,
@@ -688,7 +816,174 @@ void playaudio(){
                                           ),
                                         ),
                                       ),
+                                      if (messages![index]
+                                          .filepath.isNotEmpty)
+                                        GestureDetector(
 
+                                          onTap: () {
+                                            log("tap");
+                                            urllauch(messages![index]
+                                                .filepath);
+                                          },
+
+                                          child: Container(
+                                            padding: const EdgeInsets.only(
+                                                left: 14,
+                                                right: 14,
+
+                                                bottom: 14),
+                                            child: Align(
+                                              alignment:
+                                              messages![index].messageType ==
+                                                  'sender'
+                                                  ? Alignment.topRight
+                                                  : Alignment.topLeft,
+                                              child: Container(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10,
+                                                    right: 10,
+                                                    top: 10,
+                                                    bottom: 10),
+
+                                                margin: messages![index].messageType == 'sender' ?EdgeInsets.only(left: 44):EdgeInsets.only(right: 44),
+                                                child: Container(
+                                                  width: 200,
+                                                  decoration:
+                                                  messages![index].messageType ==
+                                                      'sender'
+                                                      ? Styles.boxme
+                                                      : Styles.boxsomebody,
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Container(
+                                                        padding: const EdgeInsets.only(
+                                                            left: 10,
+                                                            right: 10,
+                                                            top: 10,
+                                                            bottom: 10),
+                                                        child: Text(
+                                                            "${messages![index].messagetime.hour.toString().padLeft(2, '')}:${messages![index].messagetime.minute.toString().padLeft(2, '')}",
+                                                            style: const TextStyle(
+                                                                fontSize: 12,
+                                                                color: Colors.grey)),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Column(children: [
+                                                        Container(
+                                                            margin:
+                                                            const EdgeInsets.all(5),
+                                                            padding: const EdgeInsets.only(
+                                                                left: 10,
+                                                                right: 10,
+                                                                bottom: 10),
+                                                            alignment: Alignment.topRight,
+                                                            child: Container(
+                                                              width: 200,
+                                                              child: Text(messages![index]
+                                                                  .filename,style: TextStyle(color: Colors.white),))
+                                                        ),
+                                                      ]),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      if (messages![index]
+                                          .imagepath
+                                          .isNotEmpty)
+                                        GestureDetector(
+                                          onTap: (){
+                                            AlertDialog alert = AlertDialog(
+                                              contentPadding: EdgeInsets.all(4),
+                                              insetPadding: EdgeInsets.all(4),
+                                              content: Imageview(filepath: messages![index]
+                                                  .imagepath, type: 1, videopath:'',),
+                                            );
+                                            showDialog(context: context, builder: (BuildContext context){
+                                              return alert;
+                                            },);
+                                          },
+                                      child:  Container(
+                                          padding: const EdgeInsets.only(
+                                              left: 14,
+                                              right: 14,
+
+                                              bottom: 14),
+                                          child: Align(
+                                            alignment:
+                                            messages![index].messageType ==
+                                                'sender'
+                                                ? Alignment.topRight
+                                                : Alignment.topLeft,
+                                            child: Container(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10,
+                                                  right: 10,
+                                                  top: 10,
+                                                  bottom: 10),
+
+                                              margin: messages![index].messageType == 'sender' ?EdgeInsets.only(left: 44):EdgeInsets.only(right: 44),
+                                              child: Container(
+                                                height: 150,
+                                                width: 150,
+                                                decoration:
+                                                messages![index].messageType ==
+                                                    'sender'
+                                                    ? Styles.imageboxme
+                                                    : Styles.imageboxsomebody,
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      padding: const EdgeInsets.only(
+                                                          left: 10,
+                                                          right: 10,
+                                                          top: 10,
+                                                          bottom: 10),
+                                                      child: Text(
+                                                          "${messages![index].messagetime.hour.toString().padLeft(2, '')}:${messages![index].messagetime.minute.toString().padLeft(2, '')}",
+                                                          style: const TextStyle(
+                                                              fontSize: 12,
+                                                              color: Colors.grey)),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Column(children: [
+                                                      Container(
+                                                        margin:
+                                                        const EdgeInsets.all(5),
+                                                        alignment:   messages![index].messageType ==
+                                                            'sender'
+                                                            ? Alignment.topRight
+                                                            : Alignment.topLeft,
+                                                        child: Container(
+                                                          height: 100,
+                                                          width: 150,
+                                                          child: FadeInImage(
+                                                            placeholder: FileImage(
+                                                                File(messages![
+                                                                index]
+                                                                    .imagepath)),
+                                                            image: const NetworkImage(
+                                                                'https://blog.logrocket.com/wp-content/uploads/2021/09/flutter-video-plugin-play-pause.png'),
+                                                            fit: BoxFit.fill,
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ]),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+    ),
                                     ],
                                   ),
                           ),
@@ -866,7 +1161,7 @@ void playaudio(){
                                                   messagetime: DateTime.now(),
                                                   uint8list: null,
                                                   videoController: null,
-                                                  audio: ''));
+                                                  audio: '', filepath: '', filename: ''));
                                               msgtime!.add(DateTime.now());
                                               _messageController.text = '';
                                             });
