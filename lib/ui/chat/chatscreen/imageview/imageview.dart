@@ -34,3 +34,30 @@ class ImageViewState extends State<Imageview>{
   }
 
 }
+
+// Container(
+//          //  height: 200,
+//            child: Center(
+//              child: PhotoViewGallery.builder(
+//                backgroundDecoration: BoxDecoration(
+//                    color: Colors.white
+//                ),
+//                scrollPhysics: const BouncingScrollPhysics(),
+//                pageController: _pageController,
+//                builder: (BuildContext context, int index) {
+//                  String myImg =widget.gallery[index];
+//                  return PhotoViewGalleryPageOptions(
+//                    imageProvider: NetworkImage(myImg),
+//                    initialScale: PhotoViewComputedScale.contained * 0.8,
+//                    // heroAttributes: PhotoViewHeroAttributes(tag: pics[index].id),
+//                  );
+//                },
+//                itemCount:widget.gallery.length,
+//                onPageChanged: (int index) {
+//                  setState(() {
+//                    firstpage = index;
+//                  });
+//                },
+//              ),
+//            )
+//            )
