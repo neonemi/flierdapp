@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
@@ -111,6 +112,12 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
           uint8list: uint8list,
           videoController: widget.videoController,
           audio: '', filepath: '', filename: ''));
+      _addItem('', 1, 1, 1, widget.name, 1,
+          1, 'sender', '', widget.videopath!, '', '',
+          '',  Utf8Decoder().convert(uint8list!), widget.image, '');
+      // _addItem('', 1, 1,
+      //     1, widget.name, 1, 1, 'sender',
+      //     '', widget.videopath!, '',  '',  '', Utf8Decoder().convert(uint8list!),widget.image,'');
     });
   }
   void load_path_video() async {
@@ -144,6 +151,9 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
         uint8list: null,
         videoController: null,
         audio: '', filepath: filepath, filename: result!.files.first.name));
+    _addItem('', 1, 1,
+        1, widget.name, 1, 1, 'sender',
+        '', '', filepath,  '',  result.files.first.name, '',widget.image,'');
     if (result == null) return;
     filename = result.files.first.name;
     log(result.files.first.name);
@@ -174,6 +184,9 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
         uint8list: null,
         videoController: null,
         audio: audiopath!, filepath: '', filename: ''));
+    _addItem('', 1, 1,
+        1, widget.name, 1, 1, 'sender',
+        '', '', '',  audiopath!, '', '',widget.image,'');
     if (result == null) return;
     audioname = result.files.first.name;
     log(result.files.first.name);
@@ -279,6 +292,9 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
             uint8list: null,
             videoController: null,
             audio: '', filepath: '', filename: ''));
+        _addItem('', 1, 1,
+            1, widget.name, 1, 1, 'sender',
+            widget.imagePath!, '', '', '', '', '',widget.image,'');
       });
     } else if (widget.videopath != null) {
       _videothumbnail();
@@ -480,7 +496,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
      // log(messages!=null?messages![1].imagepath.toString():'');
     // log(messages!=null?messages![1].messagetext.toString():"");
     log(msgtime.toString());
-    log(widget.videopath.toString());
+    log("videopath: "+widget.videopath.toString());
     log(widget.imagePath.toString());
     log(widget.videoController.toString());
     SystemChrome.setPreferredOrientations(
@@ -589,7 +605,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                   ),
                 ),
                 Align(
-                  child: messages!.isEmpty
+                  child: _chatlist.isEmpty
                       ? Container(
                           margin: const EdgeInsets.only(top: 100),
                           height: MediaQuery.of(context).size.height - 100,
@@ -599,15 +615,14 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                           margin: const EdgeInsets.only(top: 100),
                           height: MediaQuery.of(context).size.height - 100,
                           child: ListView.builder(
-                              itemCount: messages!.length,
+                              itemCount: _chatlist.length,
                               shrinkWrap: true,
                               padding: const EdgeInsets.only(top: 10),
                               physics: const ClampingScrollPhysics(),
                               itemBuilder: (context, index) =>
                                   Column(
                                     children: [
-                                      if (messages![index]
-                                          .messagetext
+                                      if (_chatlist[index]['message']
                                           .isNotEmpty)
                                       Container(
                                         padding: const EdgeInsets.only(
@@ -617,7 +632,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                             bottom: 14),
                                         child: Align(
                                           alignment:
-                                              messages![index].messageType ==
+                                          _chatlist[index]['message_type'] ==
                                                       'sender'
                                                   ? Alignment.topRight
                                                   : Alignment.topLeft,
@@ -629,7 +644,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                 bottom: 10),
                                             margin: EdgeInsets.only(left: 44),
                                             decoration:
-                                                messages![index].messageType ==
+                                            _chatlist[index]['message_type'] ==
                                                         'sender'
                                                     ? Styles.boxme
                                                     : Styles.boxsomebody,
@@ -637,7 +652,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                    "${messages![index].messagetime.hour.toString().padLeft(2, '')}:${messages![index].messagetime.minute.toString().padLeft(2, '')}",
+                                                    "${DateTime.parse(_chatlist[index]['createdAt']).hour.toString().padLeft(2, '')}:${DateTime.parse(_chatlist[index]['createdAt']).minute.toString().padLeft(2, '')}",
                                                     style: const TextStyle(
                                                         fontSize: 12,
                                                         color: Colors.grey)),
@@ -645,8 +660,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                   height: 5,
                                                 ),
                                                   Text(
-                                                    (messages![index]
-                                                        .messagetext),
+                                                    (_chatlist[index]['message']),
                                                     style: const TextStyle(
                                                         fontSize: 15,
                                                         color: Colors.white),
@@ -658,15 +672,13 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                         ),
                                       ),
 
-                                      if (messages![index]
-                                          .uint8list!=null)
+                                      if (_chatlist[index]['videopath'].isNotEmpty)
                                         GestureDetector(
                                           onTap: (){
                                             Navigator.of(context).pushReplacement(PageRouteBuilder(
                                                 opaque: false,
                                                 pageBuilder: (BuildContext context, _, __) =>
-                                                    Imageview(filepath: messages![index]
-                                                        .uint8list, type: 2, videopath: messages![index].videopath,
+                                                    Imageview(filepath: File(_chatlist[index]['videopath']).readAsBytesSync(), type: 2, videopath:_chatlist[index]['videopath'],
                                                       videoController: widget.videoController, cameras: widget.cameras, name: widget.name, chatmessage: messages, image: widget.image,
                                                       imagePath:widget.imagePath, context: _scaffoldKey.currentContext, chatid: widget.chatid,)
                                                 ));
@@ -680,7 +692,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                 bottom: 14),
                                             child: Align(
                                               alignment:
-                                              messages![index].messageType ==
+                                              _chatlist[index]['message_type'] ==
                                                   'sender'
                                                   ? Alignment.topRight
                                                   : Alignment.topLeft,
@@ -691,12 +703,13 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                     top: 10,
                                                     bottom: 10),
 
-                                                margin: messages![index].messageType == 'sender' ?EdgeInsets.only(left: 44):EdgeInsets.only(right: 44),
+                                                margin:  _chatlist[index]['message_type'] ==
+                                                    'sender' ?EdgeInsets.only(left: 44):EdgeInsets.only(right: 44),
                                                 child: Container(
                                                   height: 150,
                                                   width: 150,
                                                   decoration:
-                                                  messages![index].messageType ==
+                                                  _chatlist[index]['message_type'] ==
                                                       'sender'
                                                       ? Styles.imageboxme
                                                       : Styles.imageboxsomebody,
@@ -710,7 +723,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                             top: 10,
                                                             bottom: 10),
                                                         child: Text(
-                                                            "${messages![index].messagetime.hour.toString().padLeft(2, '')}:${messages![index].messagetime.minute.toString().padLeft(2, '')}",
+                                                            "${DateTime.parse(_chatlist[index]['createdAt']).hour.toString().padLeft(2, '')}:${DateTime.parse(_chatlist[index]['createdAt']).minute.toString().padLeft(2, '')}",
                                                             style: const TextStyle(
                                                                 fontSize: 12,
                                                                 color: Colors.grey)),
@@ -726,8 +739,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                             child: Container(
                                                               height: 100,
                                                               width: 150,
-                                                          child: Image.memory(messages![index]
-                                                              .uint8list!,fit: BoxFit.fill,),)
+                                                          child: Image.memory((File(_chatlist[index]['videopath']).readAsBytesSync()),fit: BoxFit.fill,),)
                                                         ),
                                                       ]),
                                                   ],
@@ -737,7 +749,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                           ),
                                       ),
                                         ),
-                                      if (messages![index].audio.isNotEmpty)
+                                      if (_chatlist[index]['audiopath'].isNotEmpty)
                                       Container(
                                         padding: const EdgeInsets.only(
                                             left: 14,
@@ -746,7 +758,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                             bottom: 14),
                                         child: Align(
                                           alignment:
-                                          messages![index].messageType ==
+                                          _chatlist[index]['message_type'] ==
                                               'sender'
                                               ? Alignment.topRight
                                               : Alignment.topLeft,
@@ -758,20 +770,20 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
 
                                                   Container(
                                                     width: MediaQuery.of(context).size.width,
-                                                    alignment: messages![
-                                                    index].messageType == 'sender' ? Alignment.topRight : Alignment.topLeft,
+                                                    alignment: _chatlist[index]['message_type'] ==
+                                                        'sender' ? Alignment.topRight : Alignment.topLeft,
                                                     child: Column(
                                                       mainAxisAlignment: MainAxisAlignment.start,
                                                       children: [
                                                         BubbleNormalAudio(
-                                                          isSender: messages![
-                                                          index].messageType == 'sender' ?true: false,
-                                                          time: messages![index].messagetime,
+                                                          isSender:_chatlist[index]['message_type'] ==
+                                                              'sender' ?true: false,
+                                                          time: DateTime.parse(_chatlist[index]['createdAt']),
                                                           textStyle: TextStyle(
                                                               fontSize: 12,
                                                               color: Colors.grey),
-                                                          color: messages![
-                                                          index].messageType == 'sender' ?ColorConstant.deepblue:
+                                                          color: _chatlist[index]['message_type'] ==
+                                                              'sender' ?ColorConstant.deepblue:
                                                           ColorConstant.chatrece,
                                                           duration:
                                                           durationaudio.inSeconds.toDouble(),
@@ -782,13 +794,6 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                           isLoading: isLoading,
                                                           isPause: isPause,
                                                           onSeekChanged: (value) {
-                                                            // if(durationaudio.inSeconds.toDouble()==value){
-                                                            //   setState((){
-                                                            //     isPlaying=false;
-                                                            //     isPause=true;
-                                                            //   });
-                                                            //
-                                                            // }
 
                                                           },
                                                           onPlayPauseButtonClick: () {
@@ -801,7 +806,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                               audioPlayer!.onPositionChanged.listen((event)=> setState(() => position = event));
                                                             });
                                                             if(_isPlaying==true){
-                                                              audioPlayer!.play(BytesSource(File(audiopath!).readAsBytesSync()));
+                                                              audioPlayer!.play(BytesSource(File(_chatlist[index]['audiopath']).readAsBytesSync()));
                                                             }else{
                                                              audioPlayer!.pause();
                                                             }
@@ -817,14 +822,12 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                           ),
                                         ),
                                       ),
-                                      if (messages![index]
-                                          .filepath.isNotEmpty)
+                                      if (_chatlist[index]['filepath'].isNotEmpty)
                                         GestureDetector(
 
                                           onTap: () {
                                             log("tap");
-                                            urllauch(messages![index]
-                                                .filepath);
+                                            urllauch(_chatlist[index]['filepath']);
                                           },
 
                                           child: Container(
@@ -835,7 +838,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                 bottom: 14),
                                             child: Align(
                                               alignment:
-                                              messages![index].messageType ==
+                                              _chatlist[index]['message_type'] ==
                                                   'sender'
                                                   ? Alignment.topRight
                                                   : Alignment.topLeft,
@@ -846,11 +849,12 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                     top: 10,
                                                     bottom: 10),
 
-                                                margin: messages![index].messageType == 'sender' ?EdgeInsets.only(left: 44):EdgeInsets.only(right: 44),
+                                                margin:_chatlist[index]['message_type'] ==
+                                                    'sender' ?EdgeInsets.only(left: 44):EdgeInsets.only(right: 44),
                                                 child: Container(
                                                   width: 200,
                                                   decoration:
-                                                  messages![index].messageType ==
+                                                  _chatlist[index]['message_type'] ==
                                                       'sender'
                                                       ? Styles.boxme
                                                       : Styles.boxsomebody,
@@ -864,7 +868,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                             top: 10,
                                                             bottom: 10),
                                                         child: Text(
-                                                            "${messages![index].messagetime.hour.toString().padLeft(2, '')}:${messages![index].messagetime.minute.toString().padLeft(2, '')}",
+                                                            "${DateTime.parse(_chatlist[index]['createdAt']).hour.toString().padLeft(2, '')}:${DateTime.parse(_chatlist[index]['createdAt']).minute.toString().padLeft(2, '')}",
                                                             style: const TextStyle(
                                                                 fontSize: 12,
                                                                 color: Colors.grey)),
@@ -883,8 +887,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                             alignment: Alignment.topRight,
                                                             child: Container(
                                                               width: 200,
-                                                              child: Text(messages![index]
-                                                                  .filename,style: TextStyle(color: Colors.white),))
+                                                              child: Text(_chatlist[index]['filepath'],style: TextStyle(color: Colors.white),))
                                                         ),
                                                       ]),
                                                     ],
@@ -894,16 +897,13 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                             ),
                                           ),
                                         ),
-                                      if (messages![index]
-                                          .imagepath
-                                          .isNotEmpty)
+                                      if (_chatlist[index]['imagepath'].isNotEmpty)
                                         GestureDetector(
                                           onTap: (){
                                             Navigator.of(context).pushReplacement(PageRouteBuilder(
                                                 opaque: false,
                                                 pageBuilder: (BuildContext context, _, __) =>
-                                                    Imageview(filepath: messages![index]
-                                                        .imagepath, type: 1, videopath:'', videoController: widget.videoController, cameras: widget.cameras, name: widget.name, chatmessage: messages, image: widget.image, imagePath:widget.imagePath, context: context, chatid: widget.chatid,),
+                                                    Imageview(filepath: _chatlist[index]['imagepath'], type: 1, videopath:'', videoController: widget.videoController, cameras: widget.cameras, name: widget.name, chatmessage: messages, image: widget.image, imagePath:widget.imagePath, context: context, chatid: widget.chatid,),
 
                                             ));
 
@@ -916,7 +916,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                               bottom: 14),
                                           child: Align(
                                             alignment:
-                                            messages![index].messageType ==
+                                            _chatlist[index]['message_type'] ==
                                                 'sender'
                                                 ? Alignment.topRight
                                                 : Alignment.topLeft,
@@ -927,12 +927,13 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                   top: 10,
                                                   bottom: 10),
 
-                                              margin: messages![index].messageType == 'sender' ?EdgeInsets.only(left: 44):EdgeInsets.only(right: 44),
+                                              margin:_chatlist[index]['message_type'] ==
+                                                  'sender' ?EdgeInsets.only(left: 44):EdgeInsets.only(right: 44),
                                               child: Container(
                                                 height: 150,
                                                 width: 150,
                                                 decoration:
-                                                messages![index].messageType ==
+                                                _chatlist[index]['message_type'] ==
                                                     'sender'
                                                     ? Styles.imageboxme
                                                     : Styles.imageboxsomebody,
@@ -946,7 +947,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                           top: 10,
                                                           bottom: 10),
                                                       child: Text(
-                                                          "${messages![index].messagetime.hour.toString().padLeft(2, '')}:${messages![index].messagetime.minute.toString().padLeft(2, '')}",
+                                                          "${DateTime.parse(_chatlist[index]['createdAt']).hour.toString().padLeft(2, '')}:${DateTime.parse(_chatlist[index]['createdAt']).minute.toString().padLeft(2, '')}",
                                                           style: const TextStyle(
                                                               fontSize: 12,
                                                               color: Colors.grey)),
@@ -958,7 +959,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                       Container(
                                                         margin:
                                                         const EdgeInsets.all(5),
-                                                        alignment:   messages![index].messageType ==
+                                                        alignment:    _chatlist[index]['message_type'] ==
                                                             'sender'
                                                             ? Alignment.topRight
                                                             : Alignment.topLeft,
@@ -967,9 +968,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                           width: 150,
                                                           child: FadeInImage(
                                                             placeholder: FileImage(
-                                                                File(messages![
-                                                                index]
-                                                                    .imagepath)),
+                                                                File(_chatlist[index]['imagepath'])),
                                                             image: const NetworkImage(
                                                                 'https://blog.logrocket.com/wp-content/uploads/2021/09/flutter-video-plugin-play-pause.png'),
                                                             fit: BoxFit.fill,
@@ -1162,9 +1161,9 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                   uint8list: null,
                                                   videoController: null,
                                                   audio: '', filepath: '', filename: ''));
-                                              // _addItem(_messageController.text, 1, 1,
-                                              //     1, widget.name, 1, 1, 'sender',
-                                              //     '', '', '', '', '', '',widget.image,'');
+                                              _addItem(_messageController.text, 1, 1,
+                                                  1, widget.name, 1, 1, 'sender',
+                                                  '', '', '', '', '', '',widget.image,'');
                                               msgtime!.add(DateTime.now());
                                               _messageController.text = '';
                                             });

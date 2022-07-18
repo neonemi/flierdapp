@@ -9,6 +9,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:back_button_interceptor/back_button_interceptor.dart';
+import 'package:flierdapp/ui/chat/chatscreen/camera/videoplayer.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -93,12 +94,14 @@ class _CameraSendState extends State<CameraSend> {
                   // decoration: BoxDecoration(
                   //     border: Border.all(color: Colors.pink)),
                   child: Center(
-                    child: AspectRatio(
-                        aspectRatio:
-                        widget.videoController!.value.size != null
-                            ?  widget.videoController!.value.aspectRatio
-                            : 1.0,
-                        child: VideoPlayer( widget.videoController!)),
+                    child:NetworkPlayerLifeCycle(
+                        '${widget.videopath}', // with the String dirPath I have error but if I use the same path but write like this  /data/user/0/com.XXXXX.flutter_video_test/app_flutter/Movies/2019-11-08.mp4 it's ok ... why ?
+                            (BuildContext
+                        context,
+                            VideoPlayerController
+                            controller) =>
+                            AspectRatioVideo(
+                                controller: controller)),
                   ),
                 ),
               ),
