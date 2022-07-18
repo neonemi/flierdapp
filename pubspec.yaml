@@ -50,6 +50,7 @@ dependencies:
   open_file: ^3.2.1
   url_launcher:
   photo_view:
+  audio_session:
 dev_dependencies:
   flutter_test:
     sdk: flutter

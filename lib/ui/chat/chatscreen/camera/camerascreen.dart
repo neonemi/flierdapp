@@ -22,13 +22,14 @@ class CameraApp extends StatelessWidget {
   String? name;
   String? image;
   List<ChatMessage>? chatmessage;
-   CameraApp({Key? key, required this.cameras,required this.image,required this.name,required this.chatmessage}) : super(key: key);
+  int chatid;
+   CameraApp({Key? key, required this.cameras,required this.image,required this.name,required this.chatmessage,required this.chatid}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     return CameraExampleHome(
-      cameras: cameras, name:name!, image: image!,chatmessage: chatmessage,
+      cameras: cameras, name:name!, image: image!,chatmessage: chatmessage, chatid: chatid,
     );
   }
 }
@@ -57,7 +58,9 @@ class CameraExampleHome extends StatefulWidget {
   String name="";
   String image="";
   List<ChatMessage>? chatmessage;
-  CameraExampleHome({Key? key, required this.cameras,required this.name,required this.image,required this.chatmessage}) : super(key: key);
+  int chatid;
+  CameraExampleHome({Key? key, required this.cameras,required this.name,required this.image,required this.chatmessage,
+    required this.chatid}) : super(key: key);
   @override
   _CameraExampleHomeState createState() {
     return _CameraExampleHomeState();
@@ -99,7 +102,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
         context,
         MaterialPageRoute(
             builder: (context) => ChatScreen(
-                  cameras: widget.cameras, name: widget.name,image: widget.image,chatmessage: widget.chatmessage,
+                  cameras: widget.cameras, name: widget.name,image: widget.image,chatmessage: widget.chatmessage, chatid: widget.chatid,
                 )));
     // Do some stuff.
     return true;
@@ -396,7 +399,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
                         cameras: widget.cameras,
                         imagePath: filePath,
                         videoController: null,
-                        videopath: null, image: widget.image,name: widget.name, chatmessage: widget.chatmessage,
+                        videopath: null, image: widget.image,name: widget.name, chatmessage: widget.chatmessage, chatid: widget.chatid,
                       )));
 
           // showInSnackBar('Picture saved to $filePath');
@@ -428,7 +431,7 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
                       cameras: widget.cameras,
                       imagePath: null,
                       videoController: videoController,
-                      videopath: videoPath, image: widget.image,name: widget.name,chatmessage: widget.chatmessage,
+                      videopath: videoPath, image: widget.image,name: widget.name,chatmessage: widget.chatmessage, chatid: widget.chatid,
                     )));
 
         //  showInSnackBar('Video recorded to: $videoPath');

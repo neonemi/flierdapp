@@ -203,7 +203,7 @@ class ChatPageState extends State<ChatPage>
                                     MaterialPageRoute(
                                         builder: (context) => ChatScreen(
                                               cameras: widget.cameras, image: chatusers1[index][
-                                        'profile_pic_url'].toString(), name: chatusers1[index]['name'].toString(),
+                                        'profile_pic_url'].toString(), name: chatusers1[index]['name'].toString(), chatid: chatusers1[index]['id'],
                                             )));
                               },
                               child: Container(

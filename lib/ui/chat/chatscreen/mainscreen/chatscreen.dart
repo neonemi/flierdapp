@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:audio_session/audio_session.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
@@ -10,6 +11,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:just_audio/just_audio.dart' as JustAudio;
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -35,6 +37,7 @@ class ChatScreen extends StatefulWidget {
   String name = "";
   String image = "";
   List<ChatMessage>? chatmessage;
+  int chatid;
   ChatScreen(
       {Key? key,
       this.cameras,
@@ -42,7 +45,7 @@ class ChatScreen extends StatefulWidget {
       this.videoController,
       this.imagePath,
       required this.name,
-      required this.image,this.chatmessage})
+      required this.image,this.chatmessage,required this.chatid})
       : super(key: key);
 
   @override
@@ -69,15 +72,24 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   bool visiblity = true;
   final List<StreamSubscription> _subscriptions = [];
   var audio1;
+  late JustAudio.AudioPlayer _player;
   CustomPopupMenuController controller = CustomPopupMenuController();
   Uint8List? uint8list;
   Duration duration = new Duration();
   Duration position = new Duration();
   bool isPlaying = false;
   bool isLoading = false;
-  bool isPause = false;
+  bool isPause = true;
   bool _isPlaying = false;
   AudioPlayer? audioPlayer;
+  DateTime time = DateTime.now();
+  List<DateTime>? msgtime = [].cast<DateTime>().toList(growable: true);
+  Duration durationaudio =Duration();
+  List<ChatMessage>? messages = [].cast<ChatMessage>().toList(growable: true);
+  List<String>? message = [].cast<String>().toList(growable: true);
+  var loading = false;
+  var dirPath;
+  var _openResult;
 
   Future<void> _videothumbnail() async {
     load_path_video();
@@ -101,47 +113,17 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
           audio: '', filepath: '', filename: ''));
     });
   }
-var response;
-  void playAudioFromLocalStorage(path) async {
-     response =  audioPlayer!.play(path) ;
+  void load_path_video() async {
+    loading = true;
+    final Directory extDir = await getApplicationDocumentsDirectory();
 
-//     AudioSource.uri(Uri.file(path));
-    if (response == 1) {
-      // success
-
-    } else {
-      print('Some error occured in playing from storage!');
-    }
+    setState(() {
+      dirPath = widget.videopath;
+      print(dirPath);
+      loading = false;
+      // if I print ($dirPath) I have /data/user/0/com.XXXXX.flutter_video_test/app_flutter/Movies/2019-11-08.mp4
+    });
   }
-  pauseAudio() async {
-     response =  audioPlayer!.pause() ;
-     // audioPlayer.state.index;
-    if (response == 1) {
-      // success
-
-    } else {
-      print('Some error occured in pausing');
-    }
-  }
-  stopAudio() async {
-     response =  audioPlayer!.stop();
-    if (response == 1) {
-      // success
-
-    } else {
-      print('Some error occured in stopping');
-    }
-  }
-  resumeAudio() async {
-     response =  audioPlayer!.resume();
-    if (response == 1) {
-      // success
-
-    } else {
-      print('Some error occured in resuming');
-    }
-  }
-
 
   void _pickFile() async {
     final result = await FilePicker.platform
@@ -192,7 +174,6 @@ var response;
         uint8list: null,
         videoController: null,
         audio: audiopath!, filepath: '', filename: ''));
-
     if (result == null) return;
     audioname = result.files.first.name;
     log(result.files.first.name);
@@ -247,19 +228,35 @@ var response;
       _isLoading = false;
     });
   }
-
+//Uint8List x;
+// Utf8Decoder().convert(x);
   // Insert a new journal to the database
-  Future<void> _addItem() async {
-    await SQLHelper.createItem(_messageController.text);
+
+  Future<void> _addItem(String message,int messageid,int chat_db_id,int chatid,String name,int senderid,int receiverid,
+      String messagetype,String imagepath,String videopath,String filepath,String audiopath,String filaname,
+      String uint8list,String profilepic,String gifpath) async {
+    await SQLHelper.createItem(message, messageid, chat_db_id, chatid, name, senderid, receiverid,
+        messagetype, imagepath, videopath, filepath, audiopath, filaname, uint8list,profilepic,gifpath);
     _refreshchatlist();
   }
+  Future<void> _deleteItem(int id) async {
+    await SQLHelper.deleteItem(id);
+    _refreshchatlist();
+  }
+  Future<void> _deleteAllItem() async {
+    await SQLHelper.deleteAll();
+    _refreshchatlist();
+  }
+  Future<void> _deletetable() async {
+    await SQLHelper.DropTableIfExistsThenReCreate();
+    // _refreshchatlist();
+  }
 
-  List<ChatMessage>? messages = [].cast<ChatMessage>().toList(growable: true);
-  List<String>? message = [].cast<String>().toList(growable: true);
   @override
   void initState() {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
+
     if(widget.chatmessage != null){
       if(widget.chatmessage!.isNotEmpty){
         Iterable<ChatMessage> list=List.from(widget.chatmessage!);
@@ -286,6 +283,7 @@ var response;
     } else if (widget.videopath != null) {
       _videothumbnail();
     }
+   // _refreshchatlist();
   }
 
   @override
@@ -311,21 +309,6 @@ var response;
         .showSnackBar(SnackBar(content: Text(value)));
   }
 
-  var loading = false;
-  var dirPath;
-
-  void load_path_video() async {
-    loading = true;
-    final Directory extDir = await getApplicationDocumentsDirectory();
-
-    setState(() {
-      dirPath = widget.videopath;
-      print(dirPath);
-      loading = false;
-      // if I print ($dirPath) I have /data/user/0/com.XXXXX.flutter_video_test/app_flutter/Movies/2019-11-08.mp4
-    });
-  }
-  var _openResult;
  void urllauch(String path) async {
    final message = await OpenFile.open(path);
    setState(() {
@@ -333,13 +316,7 @@ var response;
    });
     return;
   }
-  DateTime time = DateTime.now();
-  List<DateTime>? msgtime = [].cast<DateTime>().toList(growable: true);
-  AudioPlayer player = AudioPlayer();  //add this
-  AudioCache cache = new AudioCache();  //and this
-void playaudio(){
-  cache.load(audiopath!);
-}
+
 
   Widget _buildLongPressMenu(BuildContext context) {
     return Stack(
@@ -404,7 +381,7 @@ void playaudio(){
                               builder: (context) => CameraApp(
                                     cameras: widget.cameras,
                                     name: widget.name,
-                                    image: widget.image, chatmessage: messages,
+                                    image: widget.image, chatmessage: messages, chatid: widget.chatid,
                                   )));
                     },
                     child: const SizedBox(
@@ -685,14 +662,15 @@ void playaudio(){
                                           .uint8list!=null)
                                         GestureDetector(
                                           onTap: (){
-                                            AlertDialog alert = AlertDialog(
-                                              contentPadding: EdgeInsets.all(4),
-                                              content: Imageview(filepath: messages![index]
-                                                  .uint8list, type: 2, videopath: messages![index].videopath,),
-                                            );
-                                           showDialog(context: context, builder: (BuildContext context){
-                                             return alert;
-                                           },);
+                                            Navigator.of(context).pushReplacement(PageRouteBuilder(
+                                                opaque: false,
+                                                pageBuilder: (BuildContext context, _, __) =>
+                                                    Imageview(filepath: messages![index]
+                                                        .uint8list, type: 2, videopath: messages![index].videopath,
+                                                      videoController: widget.videoController, cameras: widget.cameras, name: widget.name, chatmessage: messages, image: widget.image,
+                                                      imagePath:widget.imagePath, context: _scaffoldKey.currentContext, chatid: widget.chatid,)
+                                                ));
+
                                           },
                                           child: Container(
                                             padding: const EdgeInsets.only(
@@ -793,18 +771,41 @@ void playaudio(){
                                                               fontSize: 12,
                                                               color: Colors.grey),
                                                           color: messages![
-                                                          index].messageType == 'sender' ?ColorConstant.deepblue:  ColorConstant.chatrece,
-                                                          duration: duration.inSeconds
+                                                          index].messageType == 'sender' ?ColorConstant.deepblue:
+                                                          ColorConstant.chatrece,
+                                                          duration:
+                                                          durationaudio.inSeconds.toDouble(),
+                                                          position:
+                                                          position.inSeconds
                                                               .toDouble(),
-                                                          position: position.inSeconds
-                                                              .toDouble(),
-                                                          isPlaying: isPlaying,
+                                                          isPlaying: _isPlaying,
                                                           isLoading: isLoading,
                                                           isPause: isPause,
-                                                          onSeekChanged: (value) {},
+                                                          onSeekChanged: (value) {
+                                                            // if(durationaudio.inSeconds.toDouble()==value){
+                                                            //   setState((){
+                                                            //     isPlaying=false;
+                                                            //     isPause=true;
+                                                            //   });
+                                                            //
+                                                            // }
+
+                                                          },
                                                           onPlayPauseButtonClick: () {
-                                                            playAudioFromLocalStorage(audiopath);
-                                                            //playaudio();
+                                                            log(_isPlaying.toString());
+                                                            log(isPause.toString());
+                                                            setState((){
+                                                              _isPlaying=!_isPlaying;
+                                                              isPause=!isPause;
+                                                              audioPlayer!.onDurationChanged.listen((d) => setState(() => durationaudio = d));
+                                                              audioPlayer!.onPositionChanged.listen((event)=> setState(() => position = event));
+                                                            });
+                                                            if(_isPlaying==true){
+                                                              audioPlayer!.play(BytesSource(File(audiopath!).readAsBytesSync()));
+                                                            }else{
+                                                             audioPlayer!.pause();
+                                                            }
+
                                                           },
                                                           sent: false,
                                                         ),
@@ -898,15 +899,14 @@ void playaudio(){
                                           .isNotEmpty)
                                         GestureDetector(
                                           onTap: (){
-                                            AlertDialog alert = AlertDialog(
-                                              contentPadding: EdgeInsets.all(4),
-                                              insetPadding: EdgeInsets.all(4),
-                                              content: Imageview(filepath: messages![index]
-                                                  .imagepath, type: 1, videopath:'',),
-                                            );
-                                            showDialog(context: context, builder: (BuildContext context){
-                                              return alert;
-                                            },);
+                                            Navigator.of(context).pushReplacement(PageRouteBuilder(
+                                                opaque: false,
+                                                pageBuilder: (BuildContext context, _, __) =>
+                                                    Imageview(filepath: messages![index]
+                                                        .imagepath, type: 1, videopath:'', videoController: widget.videoController, cameras: widget.cameras, name: widget.name, chatmessage: messages, image: widget.image, imagePath:widget.imagePath, context: context, chatid: widget.chatid,),
+
+                                            ));
+
                                           },
                                       child:  Container(
                                           padding: const EdgeInsets.only(
@@ -1162,9 +1162,13 @@ void playaudio(){
                                                   uint8list: null,
                                                   videoController: null,
                                                   audio: '', filepath: '', filename: ''));
+                                              // _addItem(_messageController.text, 1, 1,
+                                              //     1, widget.name, 1, 1, 'sender',
+                                              //     '', '', '', '', '', '',widget.image,'');
                                               msgtime!.add(DateTime.now());
                                               _messageController.text = '';
                                             });
+
                                             // updateData(message!);
                                             // await _addItem();
                                           },

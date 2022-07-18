@@ -88,7 +88,7 @@ class MyApp extends StatelessWidget {
                     onPressed: () {
                       Navigator.pushReplacement(context, MaterialPageRoute(
                           builder: (context) => ChatScreen(
-                            cameras:cameras, image: 'https://i.picsum.photos/id/722/200/300.jpg?hmac=MDrZtULoytyxS357HVHCqzJRUv_BsxU0MEgszPVuMyY', name:'name',
+                            cameras:cameras, image: 'https://i.picsum.photos/id/722/200/300.jpg?hmac=MDrZtULoytyxS357HVHCqzJRUv_BsxU0MEgszPVuMyY', name:'name', chatid: 1,
                           )));
                     },
                     child: const Text(

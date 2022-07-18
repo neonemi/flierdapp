@@ -25,8 +25,9 @@ class CameraSend extends StatefulWidget {
   String name="";
   String image="";
   List<ChatMessage>? chatmessage;
+  int chatid;
   CameraSend({Key? key,required this.cameras,required this.imagePath,required this.videoController,
-    required this.videopath,required this.name,required this.image,required this.chatmessage}) : super(key: key);
+    required this.videopath,required this.name,required this.image,required this.chatmessage,required this.chatid}) : super(key: key);
   @override
   _CameraSendState createState() {
     return _CameraSendState();
@@ -52,7 +53,7 @@ class _CameraSendState extends State<CameraSend> {
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras, image: widget.image,name: widget.name,chatmessage: widget.chatmessage,)));
+        context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras, image: widget.image,name: widget.name,chatmessage: widget.chatmessage, chatid: widget.chatid,)));
     // Do some stuff.
     return true;
   }
@@ -126,7 +127,7 @@ class _CameraSendState extends State<CameraSend> {
                   log('tap');
                   Navigator.pushReplacement(
                       context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras, imagePath: widget.imagePath, videoController: widget.videoController,
-                    videopath: widget.videopath, name: widget.name,image: widget.image,chatmessage: widget.chatmessage,)));
+                    videopath: widget.videopath, name: widget.name,image: widget.image,chatmessage: widget.chatmessage, chatid: widget.chatid,)));
 
                 },
                 child: Container(
