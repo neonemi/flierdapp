@@ -5,6 +5,7 @@ import 'package:flierdapp/ui/chat/chatscreen/mainscreen/chatscreen.dart';
 
 import 'package:flierdapp/utils/string.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_better_camera/camera.dart';
 
 void main() async {
@@ -23,6 +24,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     return Scaffold(
       body: Container(
         color: Colors.white,
@@ -88,7 +91,7 @@ class MyApp extends StatelessWidget {
                     onPressed: () {
                       Navigator.pushReplacement(context, MaterialPageRoute(
                           builder: (context) => ChatScreen(
-                            cameras:cameras, image: 'https://dummyimage.com/600x400/5fa9f8/efefef.png&text=User 1', name:'User1', chatid: 1,
+                            cameras:cameras, image: 'https://dummyimage.com/600x400/5fa9f8/efefef.png&text=User 1', name:'User1', chatid: 1, messagetype: 'receiver',
                           )));
                     },
                     child: const Text(

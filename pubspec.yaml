@@ -51,6 +51,7 @@ dependencies:
   url_launcher:
   photo_view:
   audio_session:
+  intl:
 dev_dependencies:
   flutter_test:
     sdk: flutter

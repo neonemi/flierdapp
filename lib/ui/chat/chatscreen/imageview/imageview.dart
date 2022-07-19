@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:video_player/video_player.dart';
@@ -22,9 +23,10 @@ class Imageview extends StatefulWidget{
   List<ChatMessage>? chatmessage;
   BuildContext? context;
   int chatid;
+  String? messagetype;
   Imageview({Key? key,required  this.filepath,required this.type,required this.videopath,required this.chatmessage,
     required this.videoController,required this.imagePath,
-    required this.image,required this.name,required this.cameras,required this.context,required this.chatid}) : super(key: key);
+    required this.image,required this.name,required this.cameras,required this.context,required this.chatid,required this.messagetype}) : super(key: key);
   @override
   ImageViewState createState() => ImageViewState();
 
@@ -44,7 +46,7 @@ class ImageViewState extends State<Imageview>{
   }
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras, image: widget.image,name: widget.name,chatmessage: widget.chatmessage, chatid: widget.chatid,)));
+        context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras, image: widget.image,name: widget.name,chatmessage: widget.chatmessage, chatid: widget.chatid, messagetype: widget.messagetype,)));
 
     // Do some stuff.
     return true;
@@ -52,6 +54,8 @@ class ImageViewState extends State<Imageview>{
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
    return
     Scaffold(
       backgroundColor: Colors.white.withOpacity(0.85),
@@ -86,7 +90,7 @@ class ImageViewState extends State<Imageview>{
                   child: TextButton(
                     onPressed: (){
                       Navigator.pushReplacement(
-                          context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras, image: widget.image,name: widget.name,chatmessage: widget.chatmessage, chatid: widget.chatid,)));
+                          context, MaterialPageRoute(builder: (context) =>  ChatScreen(cameras: widget.cameras, image: widget.image,name: widget.name,chatmessage: widget.chatmessage, chatid: widget.chatid,messagetype: widget.messagetype,)));
 
                       // Navigator.of(context).pop();
                     },

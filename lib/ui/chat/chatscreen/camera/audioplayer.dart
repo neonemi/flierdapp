@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 const double BUBBLE_RADIUS_AUDIO = 16;
 
@@ -59,7 +60,7 @@ class BubbleNormalAudio extends StatelessWidget {
     ),
     this.time
   }) : super(key: key);
-
+  String strDigits(int n) => n.toString().padLeft(2, '0');
   ///chat bubble builder method
   @override
   Widget build(BuildContext context) {
@@ -127,7 +128,8 @@ class BubbleNormalAudio extends StatelessWidget {
                 children: [
                   Container(
                     padding:EdgeInsets.only(left: 10,top: 10,bottom: 10),
-                    child: Text("${time!.hour.toString().padLeft(2, '')}:${time!.minute.toString().padLeft(2, '')}", style: textStyle,),
+                    child: Text(
+                      "${DateFormat.jm().format(DateFormat("hh:mm").parse('${time!.hour}:${time!.minute} '))}", style: textStyle,),
                   ),
                   const SizedBox(
                     height: 5,

@@ -12,6 +12,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart' as JustAudio;
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -38,7 +39,8 @@ class ChatScreen extends StatefulWidget {
   String name = "";
   String image = "";
   List<ChatMessage>? chatmessage;
-  int chatid;
+  int? chatid;
+  String? messagetype;
   ChatScreen(
       {Key? key,
       this.cameras,
@@ -46,7 +48,7 @@ class ChatScreen extends StatefulWidget {
       this.videoController,
       this.imagePath,
       required this.name,
-      required this.image,this.chatmessage,required this.chatid})
+      required this.image,this.chatmessage,required this.chatid,required this.messagetype})
       : super(key: key);
 
   @override
@@ -91,7 +93,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   var loading = false;
   var dirPath;
   var _openResult;
-
+  String strDigits(int n) => n.toString().padLeft(2, '0');
   Future<void> _videothumbnail() async {
     load_path_video();
     uint8list = await VideoThumbnail.thumbnailData(
@@ -112,9 +114,9 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
           uint8list: uint8list,
           videoController: widget.videoController,
           audio: '', filepath: '', filename: ''));
-      _addItem('', 1, 1, 1, widget.name, 1,
-          1, 'sender', '', widget.videopath!, '', '',
-          '',  Utf8Decoder().convert(uint8list!), widget.image, '');
+      _addItem('', 1, 1, widget.chatid!, widget.name, 1,
+          widget.chatid!, 'sender', '', widget.videopath!, '', '',
+          '',  String.fromCharCodes(uint8list!), widget.image, '',DateTime.now().toString());
       // _addItem('', 1, 1,
       //     1, widget.name, 1, 1, 'sender',
       //     '', widget.videopath!, '',  '',  '', Utf8Decoder().convert(uint8list!),widget.image,'');
@@ -152,8 +154,8 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
         videoController: null,
         audio: '', filepath: filepath, filename: result!.files.first.name));
     _addItem('', 1, 1,
-        1, widget.name, 1, 1, 'sender',
-        '', '', filepath,  '',  result.files.first.name, '',widget.image,'');
+        widget.chatid!, widget.name, 1,  widget.chatid!, 'sender',
+        '', '', filepath,  '',  result.files.first.name, '',widget.image,'',DateTime.now().toString());
     if (result == null) return;
     filename = result.files.first.name;
     log(result.files.first.name);
@@ -185,8 +187,8 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
         videoController: null,
         audio: audiopath!, filepath: '', filename: ''));
     _addItem('', 1, 1,
-        1, widget.name, 1, 1, 'sender',
-        '', '', '',  audiopath!, '', '',widget.image,'');
+        widget.chatid!, widget.name, 1,  widget.chatid!, 'sender',
+        '', '', '',  audiopath!, '', '',widget.image,'',DateTime.now().toString());
     if (result == null) return;
     audioname = result.files.first.name;
     log(result.files.first.name);
@@ -235,7 +237,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   }
 
   void _refreshchatlist() async {
-    final data = await SQLHelper.getItems();
+    final data = await SQLHelper.getItem(widget.chatid!);
     setState(() {
       _chatlist = data;
       _isLoading = false;
@@ -247,13 +249,13 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
 
   Future<void> _addItem(String message,int messageid,int chat_db_id,int chatid,String name,int senderid,int receiverid,
       String messagetype,String imagepath,String videopath,String filepath,String audiopath,String filaname,
-      String uint8list,String profilepic,String gifpath) async {
+      String uint8list,String profilepic,String gifpath,String time) async {
     await SQLHelper.createItem(message, messageid, chat_db_id, chatid, name, senderid, receiverid,
-        messagetype, imagepath, videopath, filepath, audiopath, filaname, uint8list,profilepic,gifpath);
+        messagetype, imagepath, videopath, filepath, audiopath, filaname, uint8list,profilepic,gifpath,time);
     _refreshchatlist();
   }
-  Future<void> _deleteItem(int id) async {
-    await SQLHelper.deleteItem(id);
+  Future<void> _deleteItem(int receiverid) async {
+    await SQLHelper.deleteItem(receiverid);
     _refreshchatlist();
   }
   Future<void> _deleteAllItem() async {
@@ -269,7 +271,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   void initState() {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
-
+      log(widget.chatid.toString());
     if(widget.chatmessage != null){
       if(widget.chatmessage!.isNotEmpty){
         Iterable<ChatMessage> list=List.from(widget.chatmessage!);
@@ -293,8 +295,8 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
             videoController: null,
             audio: '', filepath: '', filename: ''));
         _addItem('', 1, 1,
-            1, widget.name, 1, 1, 'sender',
-            widget.imagePath!, '', '', '', '', '',widget.image,'');
+            widget.chatid!, widget.name, 1,  widget.chatid!, 'sender',
+            widget.imagePath!, '', '', '', '', '',widget.image,'',DateTime.now().toString());
       });
     } else if (widget.videopath != null) {
       _videothumbnail();
@@ -397,7 +399,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                               builder: (context) => CameraApp(
                                     cameras: widget.cameras,
                                     name: widget.name,
-                                    image: widget.image, chatmessage: messages, chatid: widget.chatid,
+                                    image: widget.image, chatmessage: messages, chatid: widget.chatid!, messagetype: widget.messagetype,
                                   )));
                     },
                     child: const SizedBox(
@@ -589,7 +591,8 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                               ),
                               onTap: () {
                                 setState(() {
-                                  messages!.clear();
+                                  _deleteItem(widget.chatid!);
+                                  // messages!.clear();
                                 });
                               },
                             );
@@ -652,7 +655,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                    "${DateTime.parse(_chatlist[index]['createdAt']).hour.toString().padLeft(2, '')}:${DateTime.parse(_chatlist[index]['createdAt']).minute.toString().padLeft(2, '')}",
+                                                    "${DateFormat.jm().format(DateFormat("hh:mm").parse('${DateTime.parse(_chatlist[index]['messagetime']).hour.toString()}:${DateTime.parse(_chatlist[index]['messagetime']).minute.toString()} '))}",
                                                     style: const TextStyle(
                                                         fontSize: 12,
                                                         color: Colors.grey)),
@@ -680,7 +683,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                 pageBuilder: (BuildContext context, _, __) =>
                                                     Imageview(filepath: File(_chatlist[index]['videopath']).readAsBytesSync(), type: 2, videopath:_chatlist[index]['videopath'],
                                                       videoController: widget.videoController, cameras: widget.cameras, name: widget.name, chatmessage: messages, image: widget.image,
-                                                      imagePath:widget.imagePath, context: _scaffoldKey.currentContext, chatid: widget.chatid,)
+                                                      imagePath:widget.imagePath, context: _scaffoldKey.currentContext, chatid: widget.chatid!, messagetype: widget.messagetype,)
                                                 ));
 
                                           },
@@ -723,7 +726,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                             top: 10,
                                                             bottom: 10),
                                                         child: Text(
-                                                            "${DateTime.parse(_chatlist[index]['createdAt']).hour.toString().padLeft(2, '')}:${DateTime.parse(_chatlist[index]['createdAt']).minute.toString().padLeft(2, '')}",
+                                                            "${DateFormat.jm().format(DateFormat("hh:mm").parse('${DateTime.parse(_chatlist[index]['messagetime']).hour.toString()}:${DateTime.parse(_chatlist[index]['messagetime']).minute.toString()} '))}",
                                                             style: const TextStyle(
                                                                 fontSize: 12,
                                                                 color: Colors.grey)),
@@ -739,7 +742,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                             child: Container(
                                                               height: 100,
                                                               width: 150,
-                                                          child: Image.memory((File(_chatlist[index]['videopath']).readAsBytesSync()),fit: BoxFit.fill,),)
+                                                          child: Image.memory(Uint8List.fromList(_chatlist[index]['uint8list'].codeUnits),fit: BoxFit.fill,),)
                                                         ),
                                                       ]),
                                                   ],
@@ -778,7 +781,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                         BubbleNormalAudio(
                                                           isSender:_chatlist[index]['message_type'] ==
                                                               'sender' ?true: false,
-                                                          time: DateTime.parse(_chatlist[index]['createdAt']),
+                                                          time: DateTime.parse(_chatlist[index]['messagetime']),
                                                           textStyle: TextStyle(
                                                               fontSize: 12,
                                                               color: Colors.grey),
@@ -868,7 +871,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                             top: 10,
                                                             bottom: 10),
                                                         child: Text(
-                                                            "${DateTime.parse(_chatlist[index]['createdAt']).hour.toString().padLeft(2, '')}:${DateTime.parse(_chatlist[index]['createdAt']).minute.toString().padLeft(2, '')}",
+                                                            "${DateFormat.jm().format(DateFormat("hh:mm").parse('${DateTime.parse(_chatlist[index]['messagetime']).hour.toString()}:${DateTime.parse(_chatlist[index]['messagetime']).minute.toString()} '))}",
                                                             style: const TextStyle(
                                                                 fontSize: 12,
                                                                 color: Colors.grey)),
@@ -903,7 +906,10 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                             Navigator.of(context).pushReplacement(PageRouteBuilder(
                                                 opaque: false,
                                                 pageBuilder: (BuildContext context, _, __) =>
-                                                    Imageview(filepath: _chatlist[index]['imagepath'], type: 1, videopath:'', videoController: widget.videoController, cameras: widget.cameras, name: widget.name, chatmessage: messages, image: widget.image, imagePath:widget.imagePath, context: context, chatid: widget.chatid,),
+                                                    Imageview(filepath: _chatlist[index]['imagepath'], type: 1, videopath:'',
+                                                      videoController: widget.videoController, cameras: widget.cameras, name: widget.name,
+                                                      chatmessage: messages, image: widget.image, imagePath:widget.imagePath, context: context,
+                                                      chatid: widget.chatid!,messagetype: widget.messagetype,),
 
                                             ));
 
@@ -947,7 +953,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                           top: 10,
                                                           bottom: 10),
                                                       child: Text(
-                                                          "${DateTime.parse(_chatlist[index]['createdAt']).hour.toString().padLeft(2, '')}:${DateTime.parse(_chatlist[index]['createdAt']).minute.toString().padLeft(2, '')}",
+                                                          "${DateFormat.jm().format(DateFormat("hh:mm").parse('${DateTime.parse(_chatlist[index]['messagetime']).hour.toString()}:${DateTime.parse(_chatlist[index]['messagetime']).minute.toString()} '))}",
                                                           style: const TextStyle(
                                                               fontSize: 12,
                                                               color: Colors.grey)),
@@ -969,8 +975,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                           child: FadeInImage(
                                                             placeholder: FileImage(
                                                                 File(_chatlist[index]['imagepath'])),
-                                                            image: const NetworkImage(
-                                                                'https://blog.logrocket.com/wp-content/uploads/2021/09/flutter-video-plugin-play-pause.png'),
+                                                            image:  MemoryImage(File(_chatlist[index]['imagepath']).readAsBytesSync()),
                                                             fit: BoxFit.fill,
                                                           ),
                                                         ),
@@ -1162,8 +1167,8 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                                   videoController: null,
                                                   audio: '', filepath: '', filename: ''));
                                               _addItem(_messageController.text, 1, 1,
-                                                  1, widget.name, 1, 1, 'sender',
-                                                  '', '', '', '', '', '',widget.image,'');
+                                                  widget.chatid!, widget.name, 1, widget.chatid!, 'sender',
+                                                  '', '', '', '', '', '',widget.image,'',DateTime.now().toString());
                                               msgtime!.add(DateTime.now());
                                               _messageController.text = '';
                                             });
@@ -1202,3 +1207,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
     );
   }
 }
+
+//CREATE TABLE chatwindow (key_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,chat_id INTEGER,chat_db_id INTEGER,message_id INTEGER,message TEXT,name TEXT,sender_id INTEGER,receiver_id INTEGER,message_type TEXT,profilepic TEXT,counter INTEGER,
+//         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)
+//CREATE TABLE messagelist (key_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,chat_id INTEGER,chat_db_id INTEGER,message_id INTEGER,message TEXT,name TEXT,sender_id INTEGER,receiver_id INTEGER,message_type TEXT,imagepath TEXT,videopath TEXT,filepath TEXT,audiopath TEXT,filename TEXT,uint8list TEXT,profilepic TEXT,gifpath TEXT,messagetime TEXT,createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)
