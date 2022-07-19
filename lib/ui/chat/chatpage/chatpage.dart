@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:back_button_interceptor/back_button_interceptor.dart';
@@ -11,8 +10,6 @@ import '../../../main.dart';
 import 'chatpagepresenter.dart';
 import 'chatpageview.dart';
 import '../chatscreen/mainscreen/chatscreen.dart';
-import 'chatpresenter.dart';
-
 
 class ChatPage extends StatefulWidget {
   final cameras;
@@ -69,7 +66,6 @@ class ChatPageState extends State<ChatPage>
     _refreshchatlist();
     _presenter = ChatPagePresenter(this);
     _presenter.getChatUsers();
-
   }
 
   @override
@@ -113,30 +109,55 @@ class ChatPageState extends State<ChatPage>
       },
     );
   }
-  Future<void> _addItem(String message,int messageid,int chat_db_id,int chatid,String name,int senderid,int receiverid,
-      String messagetype,String profilepic,int counter) async {
-    await SQLHelper.createChatwindowItem(message, messageid, chat_db_id, chatid, name, senderid, receiverid,
-        messagetype,profilepic,counter);
+
+  Future<void> _addItem(
+      String message,
+      int messageid,
+      int chatDbId,
+      int chatid,
+      String name,
+      int senderid,
+      int receiverid,
+      String messagetype,
+      String profilepic,
+      int counter) async {
+    await SQLHelper.createChatwindowItem(message, messageid, chatDbId, chatid,
+        name, senderid, receiverid, messagetype, profilepic, counter);
     _refreshchatlist();
   }
-  Future<void> _updateItem(int id,String message,int messageid,int chat_db_id,int chatid,String name,int senderid,int receiverid,
-      String messagetype,String profilepic,int counter) async {
-    await SQLHelper.updatechatwindowItem(id,message, messageid, chat_db_id, chatid, name, senderid, receiverid,
-        messagetype,profilepic,counter);
+
+  Future<void> _updateItem(
+      int id,
+      String message,
+      int messageid,
+      int chatDbId,
+      int chatid,
+      String name,
+      int senderid,
+      int receiverid,
+      String messagetype,
+      String profilepic,
+      int counter) async {
+    await SQLHelper.updatechatwindowItem(id, message, messageid, chatDbId,
+        chatid, name, senderid, receiverid, messagetype, profilepic, counter);
     _refreshchatlist();
   }
+
   Future<void> _deleteItem(int id) async {
     await SQLHelper.deletechatwindowItem(id);
     _refreshchatlist();
   }
+
   Future<void> _deleteAllItem() async {
     await SQLHelper.deletechatwindowAll();
     _refreshchatlist();
   }
+
   Future<void> _deletetable() async {
     await SQLHelper.DropTableIfExistsThenReCreate();
     // _refreshchatlist();
   }
+
   void _refreshchatlist() async {
     final data = await SQLHelper.getchatwindowItems();
     setState(() {
@@ -144,6 +165,7 @@ class ChatPageState extends State<ChatPage>
       _isLoading = false;
     });
   }
+
   bool _isLoading = true;
   List<Map<String, dynamic>> _chatwindowlist = [];
   @override
@@ -159,7 +181,7 @@ class ChatPageState extends State<ChatPage>
         backgroundColor: Colors.white,
         elevation: 0.0,
         title: const Text(
-          "Messages",
+          "MESSAGES",
           style: TextStyle(color: Colors.black),
         ),
         centerTitle: true,
@@ -174,9 +196,7 @@ class ChatPageState extends State<ChatPage>
         ],
       ),
       body: userapidata1 == null
-          ? Container(
-              child: Center(child: CircularProgressIndicator()),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : Stack(
               children: [
                 chatnotstartedyet(context),
@@ -231,186 +251,178 @@ class ChatPageState extends State<ChatPage>
           )),
     );
   }
-  Widget chatnotstartedyet(BuildContext context){
+
+  Widget chatnotstartedyet(BuildContext context) {
     return chatnotstarted1 == null
         ? Container()
         : Container(
-      height: 120,
-      alignment: Alignment.center,
-      child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: chatnotstarted1.length,
-          itemBuilder: (context, index) {
-            return Container(
-              width: 70,
-              height: 70,
-              margin:
-              const EdgeInsets.fromLTRB(10, 10, 10, 0),
-              child: Column(
-                children: [
-                  Container(
+            height: 120,
+            alignment: Alignment.center,
+            child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: chatnotstarted1.length,
+                itemBuilder: (context, index) {
+                  return Container(
                     width: 70,
                     height: 70,
-                    decoration: BoxDecoration(
-                        borderRadius:
-                        BorderRadius.circular(70),
-                        image: DecorationImage(
-                            image: NetworkImage(
-                                chatnotstarted1[index]
-                                ['profile_pic_url']),
-                            fit: BoxFit.fill)),
-                    // child: CircleAvatar(
-                    //   backgroundColor: Colors.pink,
-                    //   child: Image.asset("assets/images/dummmy.png",fit: BoxFit.fill),
-                    // ),
-                  ),
-                  Text(
-                    "${chatnotstarted1[index]['name']}",
-                    style: const TextStyle(
-                        color: Colors.black, fontSize: 14),
-                  )
-                ],
-              ),
-            );
-          }),
-    );
+                    margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 70,
+                          height: 70,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(70),
+                              image: DecorationImage(
+                                  image: NetworkImage(chatnotstarted1[index]
+                                      ['profile_pic_url']),
+                                  fit: BoxFit.fill)),
+                          // child: CircleAvatar(
+                          //   backgroundColor: Colors.pink,
+                          //   child: Image.asset("assets/images/dummmy.png",fit: BoxFit.fill),
+                          // ),
+                        ),
+                        Text(
+                          "${chatnotstarted1[index]['name']}",
+                          style: const TextStyle(
+                              color: Colors.black, fontSize: 14),
+                        )
+                      ],
+                    ),
+                  );
+                }),
+          );
   }
-  Widget chatuserwidget(BuildContext context){
+
+  Widget chatuserwidget(BuildContext context) {
     return _chatwindowlist == null
         ? Container()
         : Container(
-        margin: const EdgeInsets.fromLTRB(0, 120, 0, 0),
-        child: ListView.builder(
-          itemCount: _chatwindowlist.length,
-          itemBuilder: (context, index) {
-
-            return GestureDetector(
-              onTap: () {
-                log("revid: "+_chatwindowlist[index]['receiver_id'].toString());
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ChatScreen(
-                          cameras: widget.cameras, image: _chatwindowlist[index][
-                        'profilepic'].toString(), name: _chatwindowlist[index]['name'].toString(),
-                          chatid: _chatwindowlist[index]['receiver_id'], messagetype: _chatwindowlist[index]['message_type'],
-                        )));
-              },
-              child: Container(
-                margin:
-                const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                width: 160,
-                child: Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.spaceEvenly,
-                    children: [
-                      SizedBox(
-                        width: 100,
-                        child: Stack(
-                          alignment: Alignment.bottomRight,
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.fromLTRB(
-                                  0, 0, 10, 0),
-                              width: 90,
-                              height: 90,
-                              decoration: BoxDecoration(
-                                  borderRadius:
-                                  BorderRadius.circular(20),
-                                  image: DecorationImage(
-                                      image: NetworkImage(
-                                          _chatwindowlist[index][
-                                          'profilepic']),
-                                      // : AssetImage("assets/images/dummy.png"),
-                                      fit: BoxFit.fill)),
-                              child: Container(),
-                            ),
-                            // Align(
-                            //   alignment: Alignment.bottomRight,
-                            //   child: Container(
-                            //       height: 40,
-                            //       width: 40,
-                            //       alignment: Alignment.center,
-                            //       decoration: BoxDecoration(
-                            //         color: Colors.orange,
-                            //         borderRadius:
-                            //             BorderRadius.circular(
-                            //                 40),
-                            //       ),
-                            //       child: const Icon(
-                            //         Icons
-                            //             .remove_red_eye_rounded,
-                            //         color: Colors.white,
-                            //       )),
-                            // ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        width: 170,
-                        margin: const EdgeInsets.fromLTRB(
-                            0, 10, 10, 10),
-                        child: Column(
-                            mainAxisAlignment:
-                            MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Container(
-                                //  height: 20,
-                                alignment: Alignment.topRight,
-                                width: 170,
-                                child: Container(
-                                    width: 20,
-                                    height: 20,
-                                    alignment: Alignment.center,
-                                    decoration:
-                                    const BoxDecoration(
-                                        shape:
-                                        BoxShape.circle,
-                                        color: Colors.blue),
-                                    child:  Text(
-                                      "${_chatwindowlist[index][
-                                      'counter']}",
-                                      style: TextStyle(
-                                          color: Colors.white),
-                                      textAlign: TextAlign.end,
-                                    )),
-                              ),
-                              Container(
-                                width: MediaQuery.of(context)
-                                    .size
-                                    .width -
-                                    120,
-                                alignment: Alignment.centerLeft,
-                                child: ListTile(
-                                  title: Text(
-                                    "${_chatwindowlist[index]['name']}",
-                                    style: const TextStyle(
-                                        color: Colors.black,
-                                        fontWeight:
-                                        FontWeight.bold),
-                                    textAlign: TextAlign.start,
-                                  ),
-                                  subtitle: Text(
-                                    "${_chatwindowlist[index]['message']}",
-                                    style: const TextStyle(
-                                        color: Colors.black),
-                                    textAlign: TextAlign.start,
-                                  ),
+            margin: const EdgeInsets.fromLTRB(0, 120, 0, 0),
+            child: ListView.builder(
+              itemCount: _chatwindowlist.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    log("revid: ${_chatwindowlist[index]['receiver_id']}");
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                                  cameras: widget.cameras,
+                                  image: _chatwindowlist[index]['profilepic']
+                                      .toString(),
+                                  name:
+                                      _chatwindowlist[index]['name'].toString(),
+                                  chatid: _chatwindowlist[index]['receiver_id'],
+                                  messagetype: _chatwindowlist[index]
+                                      ['message_type'],
+                                )));
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                    width: 160,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(
+                            width: 100,
+                            child: Stack(
+                              alignment: Alignment.bottomRight,
+                              children: [
+                                Container(
+                                  margin:
+                                      const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                  width: 90,
+                                  height: 90,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      image: DecorationImage(
+                                          image: NetworkImage(
+                                              _chatwindowlist[index]
+                                                  ['profilepic']),
+                                          // : AssetImage("assets/images/dummy.png"),
+                                          fit: BoxFit.fill)),
+                                  child: Container(),
                                 ),
-                              ),
-                              Container(
-                                  alignment:
-                                  Alignment.bottomCenter,
-                                  child: const Divider(
-                                    color: Colors.grey,
-                                  ))
-                            ]),
-                      ),
-                    ]),
-              ),
-            );
-          },
-        ));
+                                // Align(
+                                //   alignment: Alignment.bottomRight,
+                                //   child: Container(
+                                //       height: 40,
+                                //       width: 40,
+                                //       alignment: Alignment.center,
+                                //       decoration: BoxDecoration(
+                                //         color: Colors.orange,
+                                //         borderRadius:
+                                //             BorderRadius.circular(
+                                //                 40),
+                                //       ),
+                                //       child: const Icon(
+                                //         Icons
+                                //             .remove_red_eye_rounded,
+                                //         color: Colors.white,
+                                //       )),
+                                // ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            width: 170,
+                            margin: const EdgeInsets.fromLTRB(0, 10, 10, 10),
+                            child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Container(
+                                    //  height: 20,
+                                    alignment: Alignment.topRight,
+                                    width: 170,
+                                    child: Container(
+                                        width: 20,
+                                        height: 20,
+                                        alignment: Alignment.center,
+                                        decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.blue),
+                                        child: Text(
+                                          "${_chatwindowlist[index]['counter']}",
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                          textAlign: TextAlign.end,
+                                        )),
+                                  ),
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width - 120,
+                                    alignment: Alignment.centerLeft,
+                                    child: ListTile(
+                                      title: Text(
+                                        "${_chatwindowlist[index]['name']}",
+                                        style: const TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      subtitle: Text(
+                                        "${_chatwindowlist[index]['message']}",
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                      alignment: Alignment.bottomCenter,
+                                      child: const Divider(
+                                        color: Colors.grey,
+                                      ))
+                                ]),
+                          ),
+                        ]),
+                  ),
+                );
+              },
+            ));
   }
 
   @override
@@ -420,11 +432,28 @@ class ChatPageState extends State<ChatPage>
       userapidata1 = userapidata;
       chatnotstarted1 = chatnotstarted;
       chatusers1 = chatusers;
-        for (int i = 0; i <= chatusers1.length; i++) {
-          if(chatusers!=null) {
-            _refreshchatlist();
-            if (_chatwindowlist.isEmpty) {
-              log('add item');
+      for (int i = 0; i <= chatusers1.length; i++) {
+        if (chatusers != null) {
+          _refreshchatlist();
+          if (_chatwindowlist.isEmpty) {
+            log('add item');
+            _addItem(
+                'hello',
+                1,
+                1,
+                1,
+                chatusers1[i]['name'],
+                1,
+                chatusers1[i]['id'],
+                'receiver',
+                chatusers1[i]['profile_pic_url'],
+                1);
+          } else {
+            if (_chatwindowlist.isNotEmpty &&
+                chatusers1[i]['id'] != _chatwindowlist[i]['receiver_id']) {
+              log("receiver id: ${_chatwindowlist[i]['receiver_id']}");
+              log("chatuser id: ${chatusers1[i]['id']}");
+              _deleteAllItem();
               _addItem(
                   'hello',
                   1,
@@ -434,51 +463,28 @@ class ChatPageState extends State<ChatPage>
                   1,
                   chatusers1[i]['id'],
                   'receiver',
-                  chatusers1[i][
-                  'profile_pic_url'],
+                  chatusers1[i]['profile_pic_url'],
                   1);
-            } else {
-              if (_chatwindowlist.isNotEmpty &&
-                  chatusers1[i]['id'] != _chatwindowlist[i]['receiver_id']) {
-                log("receiver id: ${_chatwindowlist[i]['receiver_id']}");
-                log("chatuser id: ${chatusers1[i]['id']}");
-                _deleteAllItem();
-                _addItem(
-                    'hello',
-                    1,
-                    1,
-                    1,
-                    chatusers1[i]['name'],
-                    1,
-                    chatusers1[i]['id'],
-                    'receiver',
-                    chatusers1[i][
-                    'profile_pic_url'],
-                    1);
-              } else
-              if (chatusers1[i]['id'] != _chatwindowlist[i]['receiver_id']) {
-                log('update item');
-                // _deleteAllItem();
-                _updateItem(
-                    _chatwindowlist[i]['key_id'],
-                    'hello',
-                    1,
-                    1,
-                    1,
-                    chatusers1[i]['name'],
-                    1,
-                    chatusers1[i]['id'],
-                    'receiver',
-                    chatusers1[i][
-                    'profile_pic_url'],
-                    1);
-              }
+            } else if (chatusers1[i]['id'] !=
+                _chatwindowlist[i]['receiver_id']) {
+              log('update item');
+              // _deleteAllItem();
+              _updateItem(
+                  _chatwindowlist[i]['key_id'],
+                  'hello',
+                  1,
+                  1,
+                  1,
+                  chatusers1[i]['name'],
+                  1,
+                  chatusers1[i]['id'],
+                  'receiver',
+                  chatusers1[i]['profile_pic_url'],
+                  1);
             }
           }
+        }
       }
     });
-
   }
-
-
 }

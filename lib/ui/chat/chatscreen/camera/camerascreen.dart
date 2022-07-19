@@ -8,6 +8,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class CameraApp extends StatelessWidget {
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-    return CameraExampleHome(
+    return CameraHomeApp(
       cameras: cameras, name:name!, image: image!,chatmessage: chatmessage, chatid: chatid, messagetype: messagetype,
     );
   }
@@ -55,22 +56,22 @@ IconData getCameraLensIcon(CameraLensDirection? direction) {
 void logError(String code, String? message) =>
     print('Error: $code\nError Message: $message');
 
-class CameraExampleHome extends StatefulWidget {
+class CameraHomeApp extends StatefulWidget {
   var cameras;
   String name="";
   String image="";
   List<ChatMessage>? chatmessage;
   int chatid;
   String? messagetype;
-  CameraExampleHome({Key? key, required this.cameras,required this.name,required this.image,required this.chatmessage,
+  CameraHomeApp({Key? key, required this.cameras,required this.name,required this.image,required this.chatmessage,
     required this.chatid,required this.messagetype}) : super(key: key);
   @override
-  _CameraExampleHomeState createState() {
-    return _CameraExampleHomeState();
+  CameraHomeAppState createState() {
+    return CameraHomeAppState();
   }
 }
 
-class _CameraExampleHomeState extends State<CameraExampleHome>
+class CameraHomeAppState extends State<CameraHomeApp>
     with WidgetsBindingObserver {
   CameraController? controller;
   String? imagePath;
@@ -157,7 +158,9 @@ class _CameraExampleHomeState extends State<CameraExampleHome>
                           //controller.setPointOfInterest(scaledPoint);
                         },
                         onZoom: (zoom) {
-                          print('zoom');
+                          if (kDebugMode) {
+                            print('zoom');
+                          }
                           if (zoom < 11) {
                             controller!.zoom(zoom);
                           }
@@ -679,7 +682,9 @@ class _ZoomableWidgetState extends State<ZoomableWidget> {
   Widget build(BuildContext context) {
     return GestureDetector(
         onScaleStart: (scaleDetails) {
-          print('scalStart');
+          if (kDebugMode) {
+            print('scalStart');
+          }
           setState(() => prevZoom = zoom);
           //print(scaleDetails);
         },
@@ -689,7 +694,9 @@ class _ZoomableWidgetState extends State<ZoomableWidget> {
           handleZoom(newZoom);
         },
         onScaleEnd: (scaleDetails) {
-          print('end');
+          if (kDebugMode) {
+            print('end');
+          }
           //print(scaleDetails);
         },
         onTapUp: (TapUpDetails det) {

@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:audio_session/audio_session.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
@@ -16,7 +14,6 @@ import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart' as JustAudio;
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
@@ -28,7 +25,6 @@ import '../../../../utils/style.dart';
 import '../../chatpage/chatpage.dart';
 import '../camera/audioplayer.dart';
 import '../camera/camerascreen.dart';
-import '../camera/videoplayer.dart';
 import '../imageview/imageview.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -48,7 +44,10 @@ class ChatScreen extends StatefulWidget {
       this.videoController,
       this.imagePath,
       required this.name,
-      required this.image,this.chatmessage,required this.chatid,required this.messagetype})
+      required this.image,
+      this.chatmessage,
+      required this.chatid,
+      required this.messagetype})
       : super(key: key);
 
   @override
@@ -78,8 +77,8 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   late JustAudio.AudioPlayer _player;
   CustomPopupMenuController controller = CustomPopupMenuController();
   Uint8List? uint8list;
-  Duration duration = new Duration();
-  Duration position = new Duration();
+  Duration duration = const Duration();
+  Duration position = const Duration();
   bool isPlaying = false;
   bool isLoading = false;
   bool isPause = true;
@@ -87,7 +86,7 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   AudioPlayer? audioPlayer;
   DateTime time = DateTime.now();
   List<DateTime>? msgtime = [].cast<DateTime>().toList(growable: true);
-  Duration durationaudio =Duration();
+  Duration durationaudio = const Duration();
   List<ChatMessage>? messages = [].cast<ChatMessage>().toList(growable: true);
   List<String>? message = [].cast<String>().toList(growable: true);
   var loading = false;
@@ -113,15 +112,33 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
           messagetime: DateTime.now(),
           uint8list: uint8list,
           videoController: widget.videoController,
-          audio: '', filepath: '', filename: ''));
-      _addItem('', 1, 1, widget.chatid!, widget.name, 1,
-          widget.chatid!, 'sender', '', widget.videopath!, '', '',
-          '',  String.fromCharCodes(uint8list!), widget.image, '',DateTime.now().toString());
+          audio: '',
+          filepath: '',
+          filename: ''));
+      _addItem(
+          '',
+          1,
+          1,
+          widget.chatid!,
+          widget.name,
+          1,
+          widget.chatid!,
+          'sender',
+          '',
+          widget.videopath!,
+          '',
+          '',
+          '',
+          String.fromCharCodes(uint8list!),
+          widget.image,
+          '',
+          DateTime.now().toString());
       // _addItem('', 1, 1,
       //     1, widget.name, 1, 1, 'sender',
       //     '', widget.videopath!, '',  '',  '', Utf8Decoder().convert(uint8list!),widget.image,'');
     });
   }
+
   void load_path_video() async {
     loading = true;
     final Directory extDir = await getApplicationDocumentsDirectory();
@@ -152,10 +169,27 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
         messagetime: DateTime.now(),
         uint8list: null,
         videoController: null,
-        audio: '', filepath: filepath, filename: result!.files.first.name));
-    _addItem('', 1, 1,
-        widget.chatid!, widget.name, 1,  widget.chatid!, 'sender',
-        '', '', filepath,  '',  result.files.first.name, '',widget.image,'',DateTime.now().toString());
+        audio: '',
+        filepath: filepath,
+        filename: result!.files.first.name));
+    _addItem(
+        '',
+        1,
+        1,
+        widget.chatid!,
+        widget.name,
+        1,
+        widget.chatid!,
+        'sender',
+        '',
+        '',
+        filepath,
+        '',
+        result.files.first.name,
+        '',
+        widget.image,
+        '',
+        DateTime.now().toString());
     if (result == null) return;
     filename = result.files.first.name;
     log(result.files.first.name);
@@ -185,10 +219,27 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
         messagetime: DateTime.now(),
         uint8list: null,
         videoController: null,
-        audio: audiopath!, filepath: '', filename: ''));
-    _addItem('', 1, 1,
-        widget.chatid!, widget.name, 1,  widget.chatid!, 'sender',
-        '', '', '',  audiopath!, '', '',widget.image,'',DateTime.now().toString());
+        audio: audiopath!,
+        filepath: '',
+        filename: ''));
+    _addItem(
+        '',
+        1,
+        1,
+        widget.chatid!,
+        widget.name,
+        1,
+        widget.chatid!,
+        'sender',
+        '',
+        '',
+        '',
+        audiopath!,
+        '',
+        '',
+        widget.image,
+        '',
+        DateTime.now().toString());
     if (result == null) return;
     audioname = result.files.first.name;
     log(result.files.first.name);
@@ -247,21 +298,55 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
 // Utf8Decoder().convert(x);
   // Insert a new journal to the database
 
-  Future<void> _addItem(String message,int messageid,int chat_db_id,int chatid,String name,int senderid,int receiverid,
-      String messagetype,String imagepath,String videopath,String filepath,String audiopath,String filaname,
-      String uint8list,String profilepic,String gifpath,String time) async {
-    await SQLHelper.createItem(message, messageid, chat_db_id, chatid, name, senderid, receiverid,
-        messagetype, imagepath, videopath, filepath, audiopath, filaname, uint8list,profilepic,gifpath,time);
+  Future<void> _addItem(
+      String message,
+      int messageid,
+      int chatDbId,
+      int chatid,
+      String name,
+      int senderid,
+      int receiverid,
+      String messagetype,
+      String imagepath,
+      String videopath,
+      String filepath,
+      String audiopath,
+      String filaname,
+      String uint8list,
+      String profilepic,
+      String gifpath,
+      String time) async {
+    await SQLHelper.createItem(
+        message,
+        messageid,
+        chatDbId,
+        chatid,
+        name,
+        senderid,
+        receiverid,
+        messagetype,
+        imagepath,
+        videopath,
+        filepath,
+        audiopath,
+        filaname,
+        uint8list,
+        profilepic,
+        gifpath,
+        time);
     _refreshchatlist();
   }
+
   Future<void> _deleteItem(int receiverid) async {
     await SQLHelper.deleteItem(receiverid);
     _refreshchatlist();
   }
+
   Future<void> _deleteAllItem() async {
     await SQLHelper.deleteAll();
     _refreshchatlist();
   }
+
   Future<void> _deletetable() async {
     await SQLHelper.DropTableIfExistsThenReCreate();
     // _refreshchatlist();
@@ -271,14 +356,13 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
   void initState() {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
-      log(widget.chatid.toString());
-    if(widget.chatmessage != null){
-      if(widget.chatmessage!.isNotEmpty){
-        Iterable<ChatMessage> list=List.from(widget.chatmessage!);
-        setState((){
+    log(widget.chatid.toString());
+    if (widget.chatmessage != null) {
+      if (widget.chatmessage!.isNotEmpty) {
+        Iterable<ChatMessage> list = List.from(widget.chatmessage!);
+        setState(() {
           messages!.addAll(list);
         });
-
       }
     }
     audioPlayer = AudioPlayer();
@@ -293,15 +377,32 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
             messagetime: DateTime.now(),
             uint8list: null,
             videoController: null,
-            audio: '', filepath: '', filename: ''));
-        _addItem('', 1, 1,
-            widget.chatid!, widget.name, 1,  widget.chatid!, 'sender',
-            widget.imagePath!, '', '', '', '', '',widget.image,'',DateTime.now().toString());
+            audio: '',
+            filepath: '',
+            filename: ''));
+        _addItem(
+            '',
+            1,
+            1,
+            widget.chatid!,
+            widget.name,
+            1,
+            widget.chatid!,
+            'sender',
+            widget.imagePath!,
+            '',
+            '',
+            '',
+            '',
+            '',
+            widget.image,
+            '',
+            DateTime.now().toString());
       });
     } else if (widget.videopath != null) {
       _videothumbnail();
     }
-   // _refreshchatlist();
+    // _refreshchatlist();
   }
 
   @override
@@ -327,23 +428,22 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
         .showSnackBar(SnackBar(content: Text(value)));
   }
 
- void urllauch(String path) async {
-   final message = await OpenFile.open(path);
-   setState(() {
-     _openResult = message;
-   });
+  void urllauch(String path) async {
+    final message = await OpenFile.open(path);
+    setState(() {
+      _openResult = message;
+    });
     return;
   }
 
-
   Widget _buildLongPressMenu(BuildContext context) {
     return Stack(
-
       children: [
         Container(
           height: 65,
           margin: const EdgeInsets.fromLTRB(12, 0, 20, 0),
-          padding: const EdgeInsets.only(left: 10, right: 4, top: 5, bottom: 10),
+          padding:
+              const EdgeInsets.only(left: 10, right: 4, top: 5, bottom: 10),
           alignment: Alignment.center,
           decoration: const BoxDecoration(
               color: Colors.white,
@@ -399,7 +499,10 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                               builder: (context) => CameraApp(
                                     cameras: widget.cameras,
                                     name: widget.name,
-                                    image: widget.image, chatmessage: messages, chatid: widget.chatid!, messagetype: widget.messagetype,
+                                    image: widget.image,
+                                    chatmessage: messages,
+                                    chatid: widget.chatid!,
+                                    messagetype: widget.messagetype,
                                   )));
                     },
                     child: const SizedBox(
@@ -477,7 +580,8 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
           alignment: Alignment.centerLeft,
           margin: const EdgeInsets.fromLTRB(12, 55, 0, 0),
           padding: const EdgeInsets.only(left: 10),
-          color: Colors.white,),
+          color: Colors.white,
+        ),
       ],
     );
   }
@@ -490,15 +594,16 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
 
     notifyListeners(); // To rebuild the Widget
   }
+
   final ScrollController _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     log(_chatlist.toString());
     log(message.toString());
-     // log(messages!=null?messages![1].imagepath.toString():'');
+    // log(messages!=null?messages![1].imagepath.toString():'');
     // log(messages!=null?messages![1].messagetext.toString():"");
     log(msgtime.toString());
-    log("videopath: "+widget.videopath.toString());
+    log("videopath: ${widget.videopath}");
     log(widget.imagePath.toString());
     log(widget.videoController.toString());
     SystemChrome.setPreferredOrientations(
@@ -510,10 +615,9 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
         extendBody: false,
         // resizeToAvoidBottomInset: false,
         body: GestureDetector(
-
           onTap: () {
-            setState((){
-              visiblity=true;
+            setState(() {
+              visiblity = true;
             });
           },
           child: Container(
@@ -618,380 +722,465 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                           margin: const EdgeInsets.only(top: 100),
                           height: MediaQuery.of(context).size.height - 100,
                           child: ListView.builder(
-                              itemCount: _chatlist.length,
-                              shrinkWrap: true,
-                              padding: const EdgeInsets.only(top: 10),
-                              physics: const ClampingScrollPhysics(),
-                              itemBuilder: (context, index) =>
-                                  Column(
-                                    children: [
-                                      if (_chatlist[index]['message']
-                                          .isNotEmpty)
-                                      Container(
-                                        padding: const EdgeInsets.only(
-                                            left: 14,
-                                            right: 14,
-
-                                            bottom: 14),
-                                        child: Align(
-                                          alignment:
-                                          _chatlist[index]['message_type'] ==
-                                                      'sender'
-                                                  ? Alignment.topRight
-                                                  : Alignment.topLeft,
-                                          child: Container(
-                                            padding: const EdgeInsets.only(
-                                                left: 10,
-                                                right: 10,
-                                                top: 10,
-                                                bottom: 10),
-                                            margin: EdgeInsets.only(left: 44),
-                                            decoration:
-                                            _chatlist[index]['message_type'] ==
-                                                        'sender'
-                                                    ? Styles.boxme
-                                                    : Styles.boxsomebody,
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                    "${DateFormat.jm().format(DateFormat("hh:mm").parse('${DateTime.parse(_chatlist[index]['messagetime']).hour.toString()}:${DateTime.parse(_chatlist[index]['messagetime']).minute.toString()} '))}",
-                                                    style: const TextStyle(
-                                                        fontSize: 12,
-                                                        color: Colors.grey)),
-                                                const SizedBox(
-                                                  height: 5,
-                                                ),
-                                                  Text(
-                                                    (_chatlist[index]['message']),
-                                                    style: const TextStyle(
-                                                        fontSize: 15,
-                                                        color: Colors.white),
-                                                    textAlign: TextAlign.left,
-                                                  ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-
-                                      if (_chatlist[index]['videopath'].isNotEmpty)
-                                        GestureDetector(
-                                          onTap: (){
-                                            Navigator.of(context).pushReplacement(PageRouteBuilder(
-                                                opaque: false,
-                                                pageBuilder: (BuildContext context, _, __) =>
-                                                    Imageview(filepath: File(_chatlist[index]['videopath']).readAsBytesSync(), type: 2, videopath:_chatlist[index]['videopath'],
-                                                      videoController: widget.videoController, cameras: widget.cameras, name: widget.name, chatmessage: messages, image: widget.image,
-                                                      imagePath:widget.imagePath, context: _scaffoldKey.currentContext, chatid: widget.chatid!, messagetype: widget.messagetype,)
-                                                ));
-
-                                          },
-                                          child: Container(
-                                            padding: const EdgeInsets.only(
-                                                left: 14,
-                                                right: 14,
-
-                                                bottom: 14),
-                                            child: Align(
-                                              alignment:
-                                              _chatlist[index]['message_type'] ==
-                                                  'sender'
-                                                  ? Alignment.topRight
-                                                  : Alignment.topLeft,
-                                              child: Container(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10,
-                                                    right: 10,
-                                                    top: 10,
-                                                    bottom: 10),
-
-                                                margin:  _chatlist[index]['message_type'] ==
-                                                    'sender' ?EdgeInsets.only(left: 44):EdgeInsets.only(right: 44),
-                                                child: Container(
-                                                  height: 150,
-                                                  width: 150,
-                                                  decoration:
-                                                  _chatlist[index]['message_type'] ==
-                                                      'sender'
-                                                      ? Styles.imageboxme
-                                                      : Styles.imageboxsomebody,
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Container(
-                                                        padding: const EdgeInsets.only(
-                                                            left: 10,
-                                                            right: 10,
-                                                            top: 10,
-                                                            bottom: 10),
-                                                        child: Text(
-                                                            "${DateFormat.jm().format(DateFormat("hh:mm").parse('${DateTime.parse(_chatlist[index]['messagetime']).hour.toString()}:${DateTime.parse(_chatlist[index]['messagetime']).minute.toString()} '))}",
-                                                            style: const TextStyle(
-                                                                fontSize: 12,
-                                                                color: Colors.grey)),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      Column(children: [
-                                                        Container(
-                                                            margin:
-                                                            const EdgeInsets.all(5),
-                                                            alignment: Alignment.topRight,
-                                                            child: Container(
-                                                              height: 100,
-                                                              width: 150,
-                                                          child: Image.memory(Uint8List.fromList(_chatlist[index]['uint8list'].codeUnits),fit: BoxFit.fill,),)
-                                                        ),
-                                                      ]),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                      ),
-                                        ),
-                                      if (_chatlist[index]['audiopath'].isNotEmpty)
-                                      Container(
-                                        padding: const EdgeInsets.only(
-                                            left: 14,
-                                            right: 14,
-                                            top: 14,
-                                            bottom: 14),
-                                        child: Align(
-                                          alignment:
-                                          _chatlist[index]['message_type'] ==
+                            itemCount: _chatlist.length,
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.only(top: 10),
+                            physics: const ClampingScrollPhysics(),
+                            itemBuilder: (context, index) => Column(
+                              children: [
+                                if (_chatlist[index]['message'].isNotEmpty)
+                                  Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 14, right: 14, bottom: 14),
+                                    child: Align(
+                                      alignment: _chatlist[index]
+                                                  ['message_type'] ==
                                               'sender'
-                                              ? Alignment.topRight
-                                              : Alignment.topLeft,
-                                          child: Container(
-
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-
-                                                  Container(
-                                                    width: MediaQuery.of(context).size.width,
-                                                    alignment: _chatlist[index]['message_type'] ==
-                                                        'sender' ? Alignment.topRight : Alignment.topLeft,
-                                                    child: Column(
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      children: [
-                                                        BubbleNormalAudio(
-                                                          isSender:_chatlist[index]['message_type'] ==
-                                                              'sender' ?true: false,
-                                                          time: DateTime.parse(_chatlist[index]['messagetime']),
-                                                          textStyle: TextStyle(
-                                                              fontSize: 12,
-                                                              color: Colors.grey),
-                                                          color: _chatlist[index]['message_type'] ==
-                                                              'sender' ?ColorConstant.deepblue:
-                                                          ColorConstant.chatrece,
-                                                          duration:
-                                                          durationaudio.inSeconds.toDouble(),
-                                                          position:
-                                                          position.inSeconds
-                                                              .toDouble(),
-                                                          isPlaying: _isPlaying,
-                                                          isLoading: isLoading,
-                                                          isPause: isPause,
-                                                          onSeekChanged: (value) {
-
-                                                          },
-                                                          onPlayPauseButtonClick: () {
-                                                            log(_isPlaying.toString());
-                                                            log(isPause.toString());
-                                                            setState((){
-                                                              _isPlaying=!_isPlaying;
-                                                              isPause=!isPause;
-                                                              audioPlayer!.onDurationChanged.listen((d) => setState(() => durationaudio = d));
-                                                              audioPlayer!.onPositionChanged.listen((event)=> setState(() => position = event));
-                                                            });
-                                                            if(_isPlaying==true){
-                                                              audioPlayer!.play(BytesSource(File(_chatlist[index]['audiopath']).readAsBytesSync()));
-                                                            }else{
-                                                             audioPlayer!.pause();
-                                                            }
-
-                                                          },
-                                                          sent: false,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                              ],
+                                          ? Alignment.topRight
+                                          : Alignment.topLeft,
+                                      child: Container(
+                                        padding: const EdgeInsets.only(
+                                            left: 10,
+                                            right: 10,
+                                            top: 10,
+                                            bottom: 10),
+                                        margin: const EdgeInsets.only(left: 44),
+                                        decoration: _chatlist[index]
+                                                    ['message_type'] ==
+                                                'sender'
+                                            ? Styles.boxme
+                                            : Styles.boxsomebody,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                                DateFormat.jm().format(
+                                                    DateFormat("hh:mm").parse(
+                                                        '${DateTime.parse(_chatlist[index]['messagetime']).hour.toString()}:${DateTime.parse(_chatlist[index]['messagetime']).minute.toString()} ')),
+                                                style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey)),
+                                            const SizedBox(
+                                              height: 5,
                                             ),
-                                          ),
+                                            Text(
+                                              (_chatlist[index]['message']),
+                                              style: const TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.white),
+                                              textAlign: TextAlign.left,
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      if (_chatlist[index]['filepath'].isNotEmpty)
-                                        GestureDetector(
-
-                                          onTap: () {
-                                            log("tap");
-                                            urllauch(_chatlist[index]['filepath']);
-                                          },
-
-                                          child: Container(
-                                            padding: const EdgeInsets.only(
-                                                left: 14,
-                                                right: 14,
-
-                                                bottom: 14),
-                                            child: Align(
-                                              alignment:
-                                              _chatlist[index]['message_type'] ==
-                                                  'sender'
-                                                  ? Alignment.topRight
-                                                  : Alignment.topLeft,
-                                              child: Container(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10,
-                                                    right: 10,
-                                                    top: 10,
-                                                    bottom: 10),
-
-                                                margin:_chatlist[index]['message_type'] ==
-                                                    'sender' ?EdgeInsets.only(left: 44):EdgeInsets.only(right: 44),
-                                                child: Container(
-                                                  width: 200,
-                                                  decoration:
-                                                  _chatlist[index]['message_type'] ==
-                                                      'sender'
-                                                      ? Styles.boxme
-                                                      : Styles.boxsomebody,
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Container(
-                                                        padding: const EdgeInsets.only(
-                                                            left: 10,
-                                                            right: 10,
-                                                            top: 10,
-                                                            bottom: 10),
-                                                        child: Text(
-                                                            "${DateFormat.jm().format(DateFormat("hh:mm").parse('${DateTime.parse(_chatlist[index]['messagetime']).hour.toString()}:${DateTime.parse(_chatlist[index]['messagetime']).minute.toString()} '))}",
-                                                            style: const TextStyle(
-                                                                fontSize: 12,
-                                                                color: Colors.grey)),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      Column(children: [
-                                                        Container(
-                                                            margin:
-                                                            const EdgeInsets.all(5),
-                                                            padding: const EdgeInsets.only(
-                                                                left: 10,
-                                                                right: 10,
-                                                                bottom: 10),
-                                                            alignment: Alignment.topRight,
-                                                            child: Container(
-                                                              width: 200,
-                                                              child: Text(_chatlist[index]['filepath'],style: TextStyle(color: Colors.white),))
-                                                        ),
-                                                      ]),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      if (_chatlist[index]['imagepath'].isNotEmpty)
-                                        GestureDetector(
-                                          onTap: (){
-                                            Navigator.of(context).pushReplacement(PageRouteBuilder(
-                                                opaque: false,
-                                                pageBuilder: (BuildContext context, _, __) =>
-                                                    Imageview(filepath: _chatlist[index]['imagepath'], type: 1, videopath:'',
-                                                      videoController: widget.videoController, cameras: widget.cameras, name: widget.name,
-                                                      chatmessage: messages, image: widget.image, imagePath:widget.imagePath, context: context,
-                                                      chatid: widget.chatid!,messagetype: widget.messagetype,),
-
-                                            ));
-
-                                          },
-                                      child:  Container(
-                                          padding: const EdgeInsets.only(
-                                              left: 14,
-                                              right: 14,
-
-                                              bottom: 14),
-                                          child: Align(
-                                            alignment:
-                                            _chatlist[index]['message_type'] ==
+                                    ),
+                                  ),
+                                if (_chatlist[index]['videopath'].isNotEmpty)
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).pushReplacement(
+                                          PageRouteBuilder(
+                                              opaque: false,
+                                              pageBuilder: (BuildContext
+                                                          context,
+                                                      _,
+                                                      __) =>
+                                                  Imageview(
+                                                    filepath: File(
+                                                            _chatlist[index]
+                                                                ['videopath'])
+                                                        .readAsBytesSync(),
+                                                    type: 2,
+                                                    videopath: _chatlist[index]
+                                                        ['videopath'],
+                                                    videoController:
+                                                        widget.videoController,
+                                                    cameras: widget.cameras,
+                                                    name: widget.name,
+                                                    chatmessage: messages,
+                                                    image: widget.image,
+                                                    imagePath: widget.imagePath,
+                                                    context: _scaffoldKey
+                                                        .currentContext,
+                                                    chatid: widget.chatid!,
+                                                    messagetype:
+                                                        widget.messagetype,
+                                                  )));
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.only(
+                                          left: 14, right: 14, bottom: 14),
+                                      child: Align(
+                                        alignment: _chatlist[index]
+                                                    ['message_type'] ==
                                                 'sender'
-                                                ? Alignment.topRight
-                                                : Alignment.topLeft,
-                                            child: Container(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10,
-                                                  right: 10,
-                                                  top: 10,
-                                                  bottom: 10),
-
-                                              margin:_chatlist[index]['message_type'] ==
-                                                  'sender' ?EdgeInsets.only(left: 44):EdgeInsets.only(right: 44),
-                                              child: Container(
-                                                height: 150,
-                                                width: 150,
-                                                decoration:
-                                                _chatlist[index]['message_type'] ==
+                                            ? Alignment.topRight
+                                            : Alignment.topLeft,
+                                        child: Container(
+                                          padding: const EdgeInsets.only(
+                                              left: 10,
+                                              right: 10,
+                                              top: 10,
+                                              bottom: 10),
+                                          margin: _chatlist[index]
+                                                      ['message_type'] ==
+                                                  'sender'
+                                              ? const EdgeInsets.only(left: 44)
+                                              : const EdgeInsets.only(
+                                                  right: 44),
+                                          child: Container(
+                                            height: 150,
+                                            width: 150,
+                                            decoration: _chatlist[index]
+                                                        ['message_type'] ==
                                                     'sender'
-                                                    ? Styles.imageboxme
-                                                    : Styles.imageboxsomebody,
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      padding: const EdgeInsets.only(
+                                                ? Styles.imageboxme
+                                                : Styles.imageboxsomebody,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
                                                           left: 10,
                                                           right: 10,
                                                           top: 10,
                                                           bottom: 10),
-                                                      child: Text(
-                                                          "${DateFormat.jm().format(DateFormat("hh:mm").parse('${DateTime.parse(_chatlist[index]['messagetime']).hour.toString()}:${DateTime.parse(_chatlist[index]['messagetime']).minute.toString()} '))}",
-                                                          style: const TextStyle(
-                                                              fontSize: 12,
-                                                              color: Colors.grey)),
-                                                    ),
-                                                    const SizedBox(
-                                                      height: 5,
-                                                    ),
-                                                    Column(children: [
-                                                      Container(
-                                                        margin:
-                                                        const EdgeInsets.all(5),
-                                                        alignment:    _chatlist[index]['message_type'] ==
-                                                            'sender'
-                                                            ? Alignment.topRight
-                                                            : Alignment.topLeft,
-                                                        child: Container(
-                                                          height: 100,
-                                                          width: 150,
-                                                          child: FadeInImage(
-                                                            placeholder: FileImage(
-                                                                File(_chatlist[index]['imagepath'])),
-                                                            image:  MemoryImage(File(_chatlist[index]['imagepath']).readAsBytesSync()),
-                                                            fit: BoxFit.fill,
-                                                          ),
-                                                        ),
-                                                      )
-                                                    ]),
-                                                  ],
+                                                  child: Text(
+                                                      DateFormat.jm().format(
+                                                          DateFormat("hh:mm").parse(
+                                                              '${DateTime.parse(_chatlist[index]['messagetime']).hour.toString()}:${DateTime.parse(_chatlist[index]['messagetime']).minute.toString()} ')),
+                                                      style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey)),
                                                 ),
-                                              ),
+                                                const SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Column(children: [
+                                                  Container(
+                                                      margin:
+                                                          const EdgeInsets.all(
+                                                              5),
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      child: SizedBox(
+                                                        height: 100,
+                                                        width: 150,
+                                                        child: Image.memory(
+                                                          Uint8List.fromList(
+                                                              _chatlist[index][
+                                                                      'uint8list']
+                                                                  .codeUnits),
+                                                          fit: BoxFit.fill,
+                                                        ),
+                                                      )),
+                                                ]),
+                                              ],
                                             ),
                                           ),
                                         ),
-    ),
-                                    ],
+                                      ),
+                                    ),
                                   ),
+                                if (_chatlist[index]['audiopath'].isNotEmpty)
+                                  Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 14,
+                                        right: 14,
+                                        top: 14,
+                                        bottom: 14),
+                                    child: Align(
+                                      alignment: _chatlist[index]
+                                                  ['message_type'] ==
+                                              'sender'
+                                          ? Alignment.topRight
+                                          : Alignment.topLeft,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            alignment: _chatlist[index]
+                                                        ['message_type'] ==
+                                                    'sender'
+                                                ? Alignment.topRight
+                                                : Alignment.topLeft,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                BubbleNormalAudio(
+                                                  isSender: _chatlist[index][
+                                                              'message_type'] ==
+                                                          'sender'
+                                                      ? true
+                                                      : false,
+                                                  time: DateTime.parse(
+                                                      _chatlist[index]
+                                                          ['messagetime']),
+                                                  textStyle: const TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey),
+                                                  color: _chatlist[index][
+                                                              'message_type'] ==
+                                                          'sender'
+                                                      ? ColorConstant.deepblue
+                                                      : ColorConstant.chatrece,
+                                                  duration: durationaudio
+                                                      .inSeconds
+                                                      .toDouble(),
+                                                  position: position.inSeconds
+                                                      .toDouble(),
+                                                  isPlaying: _isPlaying,
+                                                  isLoading: isLoading,
+                                                  isPause: isPause,
+                                                  onSeekChanged: (value) {},
+                                                  onPlayPauseButtonClick: () {
+                                                    log(_isPlaying.toString());
+                                                    log(isPause.toString());
+                                                    setState(() {
+                                                      _isPlaying = !_isPlaying;
+                                                      isPause = !isPause;
+                                                      audioPlayer!
+                                                          .onDurationChanged
+                                                          .listen((d) =>
+                                                              setState(() =>
+                                                                  durationaudio =
+                                                                      d));
+                                                      audioPlayer!
+                                                          .onPositionChanged
+                                                          .listen((event) =>
+                                                              setState(() =>
+                                                                  position =
+                                                                      event));
+                                                    });
+                                                    if (_isPlaying == true) {
+                                                      audioPlayer!.play(
+                                                          BytesSource(File(
+                                                                  _chatlist[
+                                                                          index]
+                                                                      [
+                                                                      'audiopath'])
+                                                              .readAsBytesSync()));
+                                                    } else {
+                                                      audioPlayer!.pause();
+                                                    }
+                                                  },
+                                                  sent: false,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                if (_chatlist[index]['filepath'].isNotEmpty)
+                                  GestureDetector(
+                                    onTap: () {
+                                      log("tap");
+                                      urllauch(_chatlist[index]['filepath']);
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.only(
+                                          left: 14, right: 14, bottom: 14),
+                                      child: Align(
+                                        alignment: _chatlist[index]
+                                                    ['message_type'] ==
+                                                'sender'
+                                            ? Alignment.topRight
+                                            : Alignment.topLeft,
+                                        child: Container(
+                                          padding: const EdgeInsets.only(
+                                              left: 10,
+                                              right: 10,
+                                              top: 10,
+                                              bottom: 10),
+                                          margin: _chatlist[index]
+                                                      ['message_type'] ==
+                                                  'sender'
+                                              ? const EdgeInsets.only(left: 44)
+                                              : const EdgeInsets.only(
+                                                  right: 44),
+                                          child: Container(
+                                            width: 200,
+                                            decoration: _chatlist[index]
+                                                        ['message_type'] ==
+                                                    'sender'
+                                                ? Styles.boxme
+                                                : Styles.boxsomebody,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10,
+                                                          right: 10,
+                                                          top: 10,
+                                                          bottom: 10),
+                                                  child: Text(
+                                                      DateFormat.jm().format(
+                                                          DateFormat("hh:mm").parse(
+                                                              '${DateTime.parse(_chatlist[index]['messagetime']).hour.toString()}:${DateTime.parse(_chatlist[index]['messagetime']).minute.toString()} ')),
+                                                      style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey)),
+                                                ),
+                                                const SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Column(children: [
+                                                  Container(
+                                                      margin:
+                                                          const EdgeInsets.all(
+                                                              5),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 10,
+                                                              right: 10,
+                                                              bottom: 10),
+                                                      alignment:
+                                                          Alignment.topRight,
+                                                      child: SizedBox(
+                                                          width: 200,
+                                                          child: Text(
+                                                            _chatlist[index]
+                                                                ['filename'],
+                                                            style:
+                                                                const TextStyle(
+                                                                    color: Colors
+                                                                        .white),
+                                                          ))),
+                                                ]),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                if (_chatlist[index]['imagepath'].isNotEmpty)
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context)
+                                          .pushReplacement(PageRouteBuilder(
+                                        opaque: false,
+                                        pageBuilder:
+                                            (BuildContext context, _, __) =>
+                                                Imageview(
+                                          filepath: _chatlist[index]
+                                              ['imagepath'],
+                                          type: 1,
+                                          videopath: '',
+                                          videoController:
+                                              widget.videoController,
+                                          cameras: widget.cameras,
+                                          name: widget.name,
+                                          chatmessage: messages,
+                                          image: widget.image,
+                                          imagePath: widget.imagePath,
+                                          context: context,
+                                          chatid: widget.chatid!,
+                                          messagetype: widget.messagetype,
+                                        ),
+                                      ));
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.only(
+                                          left: 14, right: 14, bottom: 14),
+                                      child: Align(
+                                        alignment: _chatlist[index]
+                                                    ['message_type'] ==
+                                                'sender'
+                                            ? Alignment.topRight
+                                            : Alignment.topLeft,
+                                        child: Container(
+                                          padding: const EdgeInsets.only(
+                                              left: 10,
+                                              right: 10,
+                                              top: 10,
+                                              bottom: 10),
+                                          margin: _chatlist[index]
+                                                      ['message_type'] ==
+                                                  'sender'
+                                              ? const EdgeInsets.only(left: 44)
+                                              : const EdgeInsets.only(
+                                                  right: 44),
+                                          child: Container(
+                                            height: 150,
+                                            width: 150,
+                                            decoration: _chatlist[index]
+                                                        ['message_type'] ==
+                                                    'sender'
+                                                ? Styles.imageboxme
+                                                : Styles.imageboxsomebody,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10,
+                                                          right: 10,
+                                                          top: 10,
+                                                          bottom: 10),
+                                                  child: Text(
+                                                      DateFormat.jm().format(
+                                                          DateFormat("hh:mm").parse(
+                                                              '${DateTime.parse(_chatlist[index]['messagetime']).hour.toString()}:${DateTime.parse(_chatlist[index]['messagetime']).minute.toString()} ')),
+                                                      style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey)),
+                                                ),
+                                                const SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Column(children: [
+                                                  Container(
+                                                    margin:
+                                                        const EdgeInsets.all(5),
+                                                    alignment: _chatlist[index][
+                                                                'message_type'] ==
+                                                            'sender'
+                                                        ? Alignment.topRight
+                                                        : Alignment.topLeft,
+                                                    child: SizedBox(
+                                                      height: 100,
+                                                      width: 150,
+                                                      child: FadeInImage(
+                                                        placeholder: FileImage(
+                                                            File(_chatlist[
+                                                                    index]
+                                                                ['imagepath'])),
+                                                        image: MemoryImage(File(
+                                                                _chatlist[index]
+                                                                    [
+                                                                    'imagepath'])
+                                                            .readAsBytesSync()),
+                                                        fit: BoxFit.fill,
+                                                      ),
+                                                    ),
+                                                  )
+                                                ]),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
-
                         ),
                 ),
               ],
@@ -1028,24 +1217,25 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                           onTap: () {
                             setState(() {
                               visiblity = !visiblity;
-                             // controller.menuIsShowing=! controller.menuIsShowing;
+                              // controller.menuIsShowing=! controller.menuIsShowing;
                             });
-                              if(visiblity==false) {
-                                controller.showMenu();
-                              }else{
-                                controller.hideMenu();
-                              }
-
+                            if (visiblity == false) {
+                              controller.showMenu();
+                            } else {
+                              controller.hideMenu();
+                            }
                           },
                           child: Container(
                             height: 60,
                             width: 60,
-
-                            decoration:  BoxDecoration(
+                            decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius:
-                                visiblity==false?BorderRadius.only(bottomLeft:Radius.circular(20),bottomRight:Radius.circular(20)):
-                                    BorderRadius.all(Radius.circular(20))),
+                                borderRadius: visiblity == false
+                                    ? const BorderRadius.only(
+                                        bottomLeft: Radius.circular(20),
+                                        bottomRight: Radius.circular(20))
+                                    : const BorderRadius.all(
+                                        Radius.circular(20))),
                             child: Center(
                               child: Container(
                                 height: 20,
@@ -1098,8 +1288,12 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                         children: [
                           Container(
                             //height: 80,
-                            margin: const EdgeInsets.only(right: 10,),
-                            padding:EdgeInsets.only(right: 50,) ,
+                            margin: const EdgeInsets.only(
+                              right: 10,
+                            ),
+                            padding: const EdgeInsets.only(
+                              right: 50,
+                            ),
                             width: double.infinity,
                             alignment: Alignment.center,
                             decoration: const BoxDecoration(
@@ -1116,13 +1310,13 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                               keyboardType: TextInputType.multiline,
                               textInputAction: TextInputAction.done,
                               maxLines: 5,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 isDense: true,
-                                contentPadding: const EdgeInsets.symmetric(vertical: 20,horizontal: 10),
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 20, horizontal: 10),
                                 hintText: "Write message...",
-                                hintStyle: const TextStyle(color: Colors.black54),
+                                hintStyle: TextStyle(color: Colors.black54),
                                 border: InputBorder.none,
-
                               ),
                               // keyboardType: TextInputType.text,
                               inputFormatters: <TextInputFormatter>[
@@ -1146,8 +1340,8 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                     alignment: Alignment.bottomRight,
                                     margin: const EdgeInsets.only(right: 10),
                                     decoration: const BoxDecoration(
-                                      //  color: Colors.transparent,
-                                     //   color: Colors.red,
+                                        //  color: Colors.transparent,
+                                        //   color: Colors.red,
                                         borderRadius: BorderRadius.only(
                                             topRight: Radius.circular(20),
                                             bottomRight: Radius.circular(20))),
@@ -1158,17 +1352,34 @@ class ChatScreenState extends State<ChatScreen> with ChangeNotifier {
                                             setState(() {
                                               messages!.add(ChatMessage(
                                                   messagetext:
-                                                  _messageController.text,
+                                                      _messageController.text,
                                                   messageType: 'sender',
                                                   imagepath: '',
                                                   videopath: '',
                                                   messagetime: DateTime.now(),
                                                   uint8list: null,
                                                   videoController: null,
-                                                  audio: '', filepath: '', filename: ''));
-                                              _addItem(_messageController.text, 1, 1,
-                                                  widget.chatid!, widget.name, 1, widget.chatid!, 'sender',
-                                                  '', '', '', '', '', '',widget.image,'',DateTime.now().toString());
+                                                  audio: '',
+                                                  filepath: '',
+                                                  filename: ''));
+                                              _addItem(
+                                                  _messageController.text,
+                                                  1,
+                                                  1,
+                                                  widget.chatid!,
+                                                  widget.name,
+                                                  1,
+                                                  widget.chatid!,
+                                                  'sender',
+                                                  '',
+                                                  '',
+                                                  '',
+                                                  '',
+                                                  '',
+                                                  '',
+                                                  widget.image,
+                                                  '',
+                                                  DateTime.now().toString());
                                               msgtime!.add(DateTime.now());
                                               _messageController.text = '';
                                             });

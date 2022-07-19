@@ -89,10 +89,10 @@ class MyApp extends StatelessWidget {
                       //////// HERE
                     ),
                     onPressed: () {
-                      Navigator.pushReplacement(context, MaterialPageRoute(
-                          builder: (context) => ChatScreen(
-                            cameras:cameras, image: 'https://dummyimage.com/600x400/5fa9f8/efefef.png&text=User 1', name:'User1', chatid: 1, messagetype: 'receiver',
-                          )));
+                      // Navigator.pushReplacement(context, MaterialPageRoute(
+                      //     builder: (context) => ChatScreen(
+                      //       cameras:cameras, image: 'https://dummyimage.com/600x400/5fa9f8/efefef.png&text=User 1', name:'User1', chatid: 1, messagetype: 'receiver',
+                      //     )));
                     },
                     child: const Text(
                       continueSwiping,

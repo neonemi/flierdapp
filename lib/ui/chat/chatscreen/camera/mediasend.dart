@@ -4,16 +4,13 @@
 
 // ignore_for_file: public_member_api_docs
 
-import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flierdapp/ui/chat/chatscreen/camera/videoplayer.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_better_camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 import '../../../../model/chatmessage.dart';
 import '../mainscreen/chatscreen.dart';
@@ -77,12 +74,12 @@ class _CameraSendState extends State<CameraSend> {
       alignment: Alignment.bottomRight,
         child: Container(
           color: Colors.black,
-          margin: EdgeInsets.fromLTRB(5, 5, 5, 20),
+          margin: const EdgeInsets.fromLTRB(5, 5, 5, 20),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               widget.videoController == null &&  widget.imagePath == null
-                  ? Container(
+                  ? SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,)
                   : SizedBox(
@@ -120,12 +117,12 @@ class _CameraSendState extends State<CameraSend> {
        alignment: Alignment.bottomRight,
       child: Container(
         color: Colors.black.withAlpha(100),
-        margin: EdgeInsets.only(bottom: 10),
+        margin: const EdgeInsets.only(bottom: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Container(
-              margin: EdgeInsets.fromLTRB(5, 5, 5, 10),
+              margin: const EdgeInsets.fromLTRB(5, 5, 5, 10),
               child: GestureDetector(
                 onTap: (){
                   log('tap');
@@ -138,11 +135,11 @@ class _CameraSendState extends State<CameraSend> {
                   height: 50,
                   width: 50,
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                    color: Colors.blue,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.send,color:Colors.white),
+                  child: const Icon(Icons.send,color:Colors.white),
                 ),
               ),
             ),

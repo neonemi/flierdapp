@@ -4,7 +4,6 @@ import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../model/chatmessage.dart';
@@ -13,8 +12,8 @@ import '../mainscreen/chatscreen.dart';
 
 class Imageview extends StatefulWidget{
   var filepath;
-  var type;
-  var videopath;
+  int type;
+  String videopath;
   String? imagePath;
   VideoPlayerController? videoController;
   final cameras;
@@ -74,7 +73,7 @@ class ImageViewState extends State<Imageview>{
                             controller: controller)): Center(
                   child:
 
-                  Container(
+                  SizedBox(
                     height:MediaQuery.of(context).size.height-60,
                     //  height: 200,
                       child: PhotoView(
@@ -85,7 +84,7 @@ class ImageViewState extends State<Imageview>{
                 ),
                 Container(
                   height: 50,
-                  margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                   alignment: Alignment.center,
                   child: TextButton(
                     onPressed: (){
@@ -94,7 +93,7 @@ class ImageViewState extends State<Imageview>{
 
                       // Navigator.of(context).pop();
                     },
-                    child:Icon(
+                    child:const Icon(
                       Icons.arrow_back_ios,
                       color: Colors.white,
                       size: 40,

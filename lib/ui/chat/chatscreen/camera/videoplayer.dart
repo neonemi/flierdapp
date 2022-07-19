@@ -138,7 +138,7 @@ class _FadeAnimationState extends State<FadeAnimation>
   }
 }
 
-typedef Widget VideoWidgetBuilder(
+typedef VideoWidgetBuilder = Widget Function(
     BuildContext context, VideoPlayerController controller);
 
 abstract class PlayerLifeCycle extends StatefulWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-const double BUBBLE_RADIUS_AUDIO = 16;
+const double bubbleAudioRadius = 16;
 
 ///basic chat bubble type audio message widget
 ///
@@ -47,7 +47,7 @@ class BubbleNormalAudio extends StatelessWidget {
     this.duration,
     this.position,
     this.isLoading = true,
-    this.bubbleRadius = BUBBLE_RADIUS_AUDIO,
+    this.bubbleRadius = bubbleAudioRadius,
     this.isSender,
     this.color = Colors.white70,
     this.tail = true,
@@ -68,7 +68,7 @@ class BubbleNormalAudio extends StatelessWidget {
     Icon? stateIcon;
     if (sent) {
       stateTick = true;
-      stateIcon = Icon(
+      stateIcon = const Icon(
         Icons.done,
         size: 18,
         color: Color(0xFF97AD8E),
@@ -76,7 +76,7 @@ class BubbleNormalAudio extends StatelessWidget {
     }
     if (delivered) {
       stateTick = true;
-      stateIcon = Icon(
+      stateIcon = const Icon(
         Icons.done_all,
         size: 18,
         color: Color(0xFF97AD8E),
@@ -84,7 +84,7 @@ class BubbleNormalAudio extends StatelessWidget {
     }
     if (seen) {
       stateTick = true;
-      stateIcon = Icon(
+      stateIcon = const Icon(
         Icons.done_all,
         size: 18,
         color: Color(0xFF92DEDA),
@@ -94,7 +94,7 @@ class BubbleNormalAudio extends StatelessWidget {
     return Row(
       children: <Widget>[
         isSender==true
-            ? Expanded(
+            ? const Expanded(
           child: SizedBox(
             width: 5,
           ),
@@ -116,50 +116,50 @@ class BubbleNormalAudio extends StatelessWidget {
                       ? isSender==true
                       ? bubbleRadius
                       : 0
-                      : BUBBLE_RADIUS_AUDIO),
+                      : bubbleAudioRadius),
                   bottomRight: Radius.circular(tail
                       ? isSender==true
                       ? 0
                       : bubbleRadius
-                      : BUBBLE_RADIUS_AUDIO),
+                      : bubbleAudioRadius),
                 ),
               ),
               child: Stack(
                 children: [
                   Container(
-                    padding:EdgeInsets.only(left: 10,top: 10,bottom: 10),
+                    padding:const EdgeInsets.only(left: 10,top: 10,bottom: 10),
                     child: Text(
-                      "${DateFormat.jm().format(DateFormat("hh:mm").parse('${time!.hour}:${time!.minute} '))}", style: textStyle,),
+                      DateFormat.jm().format(DateFormat("hh:mm").parse('${time!.hour}:${time!.minute} ')), style: textStyle,),
                   ),
                   const SizedBox(
                     height: 5,
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 10),
+                    margin: const EdgeInsets.only(top: 10),
                     child: Row(
                       children: [
                         RawMaterialButton(
                           onPressed: onPlayPauseButtonClick,
                           elevation: 1.0,
                           fillColor: Colors.white,
+                          padding: const EdgeInsets.all(0.0),
+                          shape: const CircleBorder(),
                           child: !isPlaying
-                              ? Icon(
+                              ? const Icon(
                             Icons.play_arrow,
                             size: 30.0,
                           )
                               : isLoading
-                              ? CircularProgressIndicator()
+                              ? const CircularProgressIndicator()
                               : isPause
-                              ? Icon(
+                              ? const Icon(
                             Icons.play_arrow,
                             size: 30.0,
                           )
-                              : Icon(
+                              : const Icon(
                             Icons.pause,
                             size: 30.0,
                           ),
-                          padding: EdgeInsets.all(0.0),
-                          shape: CircleBorder(),
                         ),
                         Expanded(
                           child: Slider(
@@ -179,7 +179,7 @@ class BubbleNormalAudio extends StatelessWidget {
                     bottom: 8,
                     right: 25,
                     child: Text(
-                      '${audioTimer(duration ?? 0.0, position ?? 0.0)}',
+                      audioTimer(duration ?? 0.0, position ?? 0.0),
                       style: textStyle,
                     ),
                   ),
@@ -189,7 +189,7 @@ class BubbleNormalAudio extends StatelessWidget {
                     right: 6,
                     child: stateIcon,
                   )
-                      : SizedBox(
+                      : const SizedBox(
                     width: 1,
                   ),
                 ],
