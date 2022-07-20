@@ -8,11 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_better_camera/camera.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Obtain a list of the available cameras on the device.
   final cameras = await availableCameras();
   runApp(MaterialApp(
+    key: navigatorKey,
       theme: ThemeData(fontFamily: "Pangram Sans"),
       debugShowCheckedModeBanner: false, home:  MyApp(cameras: cameras,)));
 }
