@@ -53,6 +53,8 @@ dependencies:
   audio_session:
   intl:
   aad_oauth: ^0.4.0
+  mqtt_client:
+  flutter_mqchat:
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -8,9 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_better_camera/camera.dart';
 
+import 'azure/azurechat.dart';
+
 final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AzureChatClient().connect();
   // Obtain a list of the available cameras on the device.
   final cameras = await availableCameras();
   runApp(MaterialApp(
